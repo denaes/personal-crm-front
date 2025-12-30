@@ -14,6 +14,8 @@ export class ContactsService {
      * @param limit
      * @param priority
      * @param tags
+     * @param sortBy
+     * @param sortOrder
      * @returns any
      * @throws ApiError
      */
@@ -22,8 +24,8 @@ export class ContactsService {
         limit?: number,
         priority?: 'low' | 'medium' | 'high',
         tags?: string,
-        sortBy?: string,
-        sortOrder?: string,
+        sortBy?: 'lastContactedAt' | 'updatedAt' | 'createdAt',
+        sortOrder?: 'ASC' | 'DESC',
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',

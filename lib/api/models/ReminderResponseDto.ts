@@ -16,6 +16,10 @@ export type ReminderResponseDto = {
      */
     contactId: string;
     /**
+     * Contact details
+     */
+    contact?: Record<string, any>;
+    /**
      * Type of reminder
      */
     type: ReminderResponseDto.type;

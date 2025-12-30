@@ -18,7 +18,7 @@ export type InteractionResponseDto = {
     /**
      * Contact details
      */
-    contact?: any;
+    contact?: Record<string, any>;
     /**
      * Type of interaction
      */

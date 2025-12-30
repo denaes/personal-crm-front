@@ -1,15 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Users, Activity, Calendar, TrendingUp } from "lucide-react";
+import { Users, Activity, Calendar, TrendingUp, Trash } from "lucide-react";
 import Link from "next/link";
 import { AppLayout } from "@/components/layout/app-layout";
 import { useContacts } from "@/lib/hooks/use-contacts";
 import { useInteractions, useDeleteInteraction } from "@/lib/hooks/use-interactions";
-import { useReminders } from "@/lib/hooks/use-reminders";
+import { useReminders, useDeleteReminder } from "@/lib/hooks/use-reminders";
 import { getInitials } from "@/lib/utils";
 import { InteractionsTable } from "@/components/interactions/interactions-table";
 import { useRouter } from "next/navigation";
+import { AiChatBox } from "@/components/ai/ai-chat-box";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -18,6 +19,7 @@ export default function DashboardPage() {
     // console.log('Dashboard contactsData:', contactsData);
     const { data: interactions } = useInteractions();
     const { mutate: deleteInteraction } = useDeleteInteraction();
+    const { mutate: deleteReminder } = useDeleteReminder();
     const { data: reminders } = useReminders(true); // Active only
 
     // Robust extraction
@@ -36,7 +38,7 @@ export default function DashboardPage() {
     // Filter reminders for today
     const today = new Date().toISOString().split('T')[0];
     const todaysReminders = Array.isArray(reminders)
-        ? reminders.filter((r: any) => r.dueDate?.startsWith(today))
+        ? reminders.filter((r: any) => (r.scheduledFor || r.dueDate)?.startsWith(today))
         : [];
 
     const stats = [
@@ -80,6 +82,11 @@ export default function DashboardPage() {
                         <p className="text-muted-foreground">
                             Welcome back! Here&apos;s what&apos;s happening.
                         </p>
+                    </div>
+
+                    {/* AI Chat Box */}
+                    <div className="mb-8">
+                        <AiChatBox />
                     </div>
 
                     {/* Stats Grid */}
@@ -151,12 +158,38 @@ export default function DashboardPage() {
                                     todaysReminders.map((reminder: any, i: number) => (
                                         <div
                                             key={reminder.id || i}
-                                            className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                                            className="p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer flex justify-between items-start group"
                                         >
-                                            <p className="text-sm font-medium">{reminder.title}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                                {new Date(reminder.dueDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </p>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium truncate">{reminder.title || reminder.message}</p>
+                                                {reminder.contact && (
+                                                    <p className="text-xs text-primary mt-0.5 truncate">
+                                                        With: {reminder.contact.displayName || `${reminder.contact.givenName} ${reminder.contact.familyName}`}
+                                                    </p>
+                                                )}
+                                                <p className="text-xs text-muted-foreground mt-0.5">
+                                                    {(() => {
+                                                        const dateStr = reminder.scheduledFor || reminder.dueDate;
+                                                        if (!dateStr) return '';
+                                                        try {
+                                                            return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                                        } catch (e) {
+                                                            return '';
+                                                        }
+                                                    })()}
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    if (confirm('Delete this reminder?')) {
+                                                        deleteReminder(reminder.id);
+                                                    }
+                                                }}
+                                                className="opacity-0 group-hover:opacity-100 p-1 hover:bg-background rounded text-muted-foreground hover:text-destructive transition-all"
+                                            >
+                                                <Trash className="w-4 h-4" />
+                                            </button>
                                         </div>
                                     ))
                                 )}

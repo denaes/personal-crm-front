@@ -7,6 +7,7 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { CommandRequestDto } from './models/CommandRequestDto';
 export { CreateContactDto } from './models/CreateContactDto';
 export { CreateInteractionDto } from './models/CreateInteractionDto';
 export { CreateReminderDto } from './models/CreateReminderDto';
@@ -16,6 +17,7 @@ export { UpdateContactDto } from './models/UpdateContactDto';
 export { UpdateInteractionDto } from './models/UpdateInteractionDto';
 export { UpdateReminderDto } from './models/UpdateReminderDto';
 
+export { AiCommandService } from './services/AiCommandService';
 export { AuthService } from './services/AuthService';
 export { ContactsService } from './services/ContactsService';
 export { InteractionsService } from './services/InteractionsService';

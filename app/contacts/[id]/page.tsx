@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useContact } from "@/lib/hooks/use-contacts";
 import { useInteractionsByContact, useCreateInteraction, useDeleteInteraction } from "@/lib/hooks/use-interactions";
-import { useRemindersByContact, useCreateReminder } from "@/lib/hooks/use-reminders";
+import { useRemindersByContact, useCreateReminder, useDeleteReminder } from "@/lib/hooks/use-reminders";
 import { AppLayout } from "@/components/layout/app-layout";
 import { getInitials, cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -36,6 +36,7 @@ export default function ContactDetailsPage() {
     const { data: interactions, isLoading: interactionsLoading } = useInteractionsByContact(id);
     const { data: reminders, isLoading: remindersLoading } = useRemindersByContact(id);
     const { mutate: deleteInteraction } = useDeleteInteraction();
+    const { mutate: deleteReminder } = useDeleteReminder();
 
     if (contactLoading) {
         return (
@@ -194,16 +195,26 @@ export default function ContactDetailsPage() {
                                         <p className="text-sm text-muted-foreground">No active reminders.</p>
                                     ) : (
                                         reminders.map((reminder: any) => (
-                                            <div key={reminder.id} className="p-3 bg-muted/30 rounded-lg flex gap-3">
+                                            <div key={reminder.id} className="p-3 bg-muted/30 rounded-lg flex gap-3 group">
                                                 <div className="mt-1">
                                                     <Clock className="w-4 h-4 text-primary" />
                                                 </div>
-                                                <div>
+                                                <div className="flex-1">
                                                     <p className="font-medium text-sm">{reminder.title || reminder.message}</p>
                                                     <p className="text-xs text-muted-foreground">
                                                         {format(new Date(reminder.scheduledFor || reminder.createdAt), 'PPP p')}
                                                     </p>
                                                 </div>
+                                                <button
+                                                    onClick={() => {
+                                                        if (confirm('Delete this reminder?')) {
+                                                            deleteReminder(reminder.id);
+                                                        }
+                                                    }}
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded text-muted-foreground hover:text-destructive"
+                                                >
+                                                    <Trash className="w-4 h-4" />
+                                                </button>
                                             </div>
                                         ))
                                     )}

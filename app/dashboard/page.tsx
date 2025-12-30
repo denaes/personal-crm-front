@@ -7,7 +7,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { useContacts } from "@/lib/hooks/use-contacts";
 import { useInteractions, useDeleteInteraction } from "@/lib/hooks/use-interactions";
 import { useReminders, useDeleteReminder } from "@/lib/hooks/use-reminders";
-import { getInitials } from "@/lib/utils";
+import { getInitials, formatDateWithOrdinal } from "@/lib/utils";
 import { InteractionsTable } from "@/components/interactions/interactions-table";
 import { useRouter } from "next/navigation";
 import { AiChatBox } from "@/components/ai/ai-chat-box";
@@ -35,10 +35,26 @@ export default function DashboardPage() {
         }
     };
 
-    // Filter reminders for today
-    const today = new Date().toISOString().split('T')[0];
+    // Filter reminders for today (Broad "Today" definition: Local Match OR UTC Match)
+    const now = new Date();
+    const todayDateString = now.toDateString();
+    // en-CA gives YYYY-MM-DD format in local time
+    const localYMD = now.toLocaleDateString('en-CA');
+
     const todaysReminders = Array.isArray(reminders)
-        ? reminders.filter((r: any) => (r.scheduledFor || r.dueDate)?.startsWith(today))
+        ? reminders.filter((r: any) => {
+            const dateStr = r.scheduledFor || r.dueDate;
+            if (!dateStr) return false;
+
+            // Check Local Date Match
+            const d = new Date(dateStr);
+            if (d.toDateString() === todayDateString) return true;
+
+            // Check UTC Date Match (e.g. if today is Dec 30 Local, include Dec 30 UTC reminders)
+            if (dateStr.startsWith(localYMD)) return true;
+
+            return false;
+        })
         : [];
 
     const stats = [
@@ -168,15 +184,7 @@ export default function DashboardPage() {
                                                     </p>
                                                 )}
                                                 <p className="text-xs text-muted-foreground mt-0.5">
-                                                    {(() => {
-                                                        const dateStr = reminder.scheduledFor || reminder.dueDate;
-                                                        if (!dateStr) return '';
-                                                        try {
-                                                            return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                                                        } catch (e) {
-                                                            return '';
-                                                        }
-                                                    })()}
+                                                    {formatDateWithOrdinal(reminder.scheduledFor || reminder.dueDate)}
                                                 </p>
                                             </div>
                                             <button

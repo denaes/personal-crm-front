@@ -17,40 +17,42 @@ export function AiChatBox() {
     const [isExpanded, setIsExpanded] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const { mutate: sendCommand, isPending } = useAiCommand();
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesContainerRef.current) {
+            const { scrollHeight, clientHeight } = messagesContainerRef.current;
+            messagesContainerRef.current.scrollTo({
+                top: scrollHeight - clientHeight,
+                behavior: 'smooth'
+            });
+        }
     }, [messages]);
 
-    // Focus input when expanded
+    // Keyboard shortcut (Cmd+/)
+    useEffect(() => {
+        const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "/") {
+                e.preventDefault();
+                setIsExpanded((prev) => !prev);
+            }
+        };
+
+        window.addEventListener("keydown", handleGlobalKeyDown);
+        return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+    }, []);
+
+    // ... existing focus effect ...
+    // Focus input when expanded without scrolling
     useEffect(() => {
         if (isExpanded && inputRef.current) {
-            inputRef.current.focus();
+            inputRef.current.focus({ preventScroll: true });
         }
     }, [isExpanded]);
-
-    // Load messages from session storage
-    useEffect(() => {
-        const saved = sessionStorage.getItem("ai-chat-messages");
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                setMessages(
-                    parsed.map((m: any) => ({
-                        ...m,
-                        timestamp: new Date(m.timestamp),
-                    }))
-                );
-            } catch (e) {
-                console.error("Failed to load chat history", e);
-            }
-        }
-    }, []);
 
     // Save messages to session storage
     useEffect(() => {
@@ -165,7 +167,10 @@ export function AiChatBox() {
                             </div>
 
                             {/* Messages */}
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                            <div
+                                ref={messagesContainerRef}
+                                className="flex-1 overflow-y-auto p-4 space-y-4"
+                            >
                                 {messages.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground">
                                         <Bot className="w-12 h-12 mb-3 opacity-50" />
@@ -223,7 +228,7 @@ export function AiChatBox() {
                                         </div>
                                     </div>
                                 )}
-                                <div ref={messagesEndRef} />
+
                             </div>
 
                             {/* Input */}

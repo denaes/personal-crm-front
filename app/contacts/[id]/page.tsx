@@ -5,7 +5,7 @@ import { useContact } from "@/lib/hooks/use-contacts";
 import { useInteractionsByContact, useCreateInteraction, useDeleteInteraction } from "@/lib/hooks/use-interactions";
 import { useRemindersByContact, useCreateReminder, useDeleteReminder } from "@/lib/hooks/use-reminders";
 import { AppLayout } from "@/components/layout/app-layout";
-import { getInitials, cn } from "@/lib/utils";
+import { getInitials, cn, formatDateWithOrdinal } from "@/lib/utils";
 import { format } from "date-fns";
 import {
     Mail,
@@ -202,7 +202,7 @@ export default function ContactDetailsPage() {
                                                 <div className="flex-1">
                                                     <p className="font-medium text-sm">{reminder.title || reminder.message}</p>
                                                     <p className="text-xs text-muted-foreground">
-                                                        {format(new Date(reminder.scheduledFor || reminder.createdAt), 'PPP p')}
+                                                        {formatDateWithOrdinal(reminder.scheduledFor || reminder.createdAt)}
                                                     </p>
                                                 </div>
                                                 <button
@@ -328,7 +328,12 @@ function InlineInteractionForm({ contactId }: { contactId: string }) {
     const { mutate: createInteraction, isPending } = useCreateInteraction();
     const [type, setType] = useState('note');
     const [content, setContent] = useState('');
-    const [occurredAt, setOccurredAt] = useState(() => new Date().toISOString().slice(0, 16));
+    const [occurredAt, setOccurredAt] = useState(() => {
+        const now = new Date();
+        const offset = now.getTimezoneOffset();
+        const local = new Date(now.getTime() - offset * 60000);
+        return local.toISOString().slice(0, 16);
+    });
 
     const types = [
         { id: 'note', label: 'Note', icon: MessageSquare },
@@ -390,12 +395,18 @@ function InlineInteractionForm({ contactId }: { contactId: string }) {
             />
 
             <div className="flex items-center justify-between gap-4">
-                <input
-                    type="datetime-local"
-                    value={occurredAt}
-                    onChange={(e) => setOccurredAt(e.target.value)}
-                    className="bg-transparent text-xs text-muted-foreground focus:outline-none"
-                />
+                <div className="relative flex items-center gap-2 group cursor-pointer p-1 rounded hover:bg-muted/50 transition-colors">
+                    <p className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">
+                        {formatDateWithOrdinal(occurredAt)}
+                    </p>
+                    <Calendar className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <input
+                        type="datetime-local"
+                        value={occurredAt}
+                        onChange={(e) => setOccurredAt(e.target.value)}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                </div>
                 <Button size="sm" type="submit" disabled={isPending}>
                     {isPending ? 'Saving...' : 'Log'}
                 </Button>
@@ -411,7 +422,9 @@ function InlineReminderForm({ contactId }: { contactId: string }) {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         tomorrow.setHours(9, 0, 0, 0);
-        return tomorrow.toISOString().slice(0, 16);
+        const offset = tomorrow.getTimezoneOffset();
+        const local = new Date(tomorrow.getTime() - offset * 60000);
+        return local.toISOString().slice(0, 16);
     });
 
     const handleSubmit = (e: React.FormEvent) => {

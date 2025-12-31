@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Users, Brain, Calendar } from "lucide-react";
 
+import { Footer } from "@/components/layout/footer";
+
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden flex-1">
         {/* Animated gradient background */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse" />
@@ -128,6 +130,7 @@ export default function Home() {
           </motion.div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

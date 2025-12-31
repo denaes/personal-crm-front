@@ -5,6 +5,8 @@ import { Navbar } from "@/components/layout/navbar";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { useCurrentUser } from "@/lib/hooks/use-auth";
 
+import { Footer } from "@/components/layout/footer";
+
 export function AppLayout({ children }: { children: React.ReactNode }) {
     const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
@@ -12,13 +14,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     useCurrentUser();
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen">
             <Navbar onSearchOpen={() => setCommandPaletteOpen(true)} />
-            {children}
+            <main className="flex-1">
+                {children}
+            </main>
+            <Footer />
             <CommandPalette
                 open={commandPaletteOpen}
                 onOpenChange={setCommandPaletteOpen}
             />
-        </>
+        </div>
     );
 }

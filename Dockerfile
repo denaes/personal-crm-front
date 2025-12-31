@@ -10,7 +10,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 
 ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL='https://rinku-api.denaes.com/api/v1'
+ENV NEXT_PUBLIC_API_URL='https://rinku-api.denaes.me/api/v1'
 
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL='https://rinku.denaes.me'

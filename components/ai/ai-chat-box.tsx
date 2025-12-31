@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Loader2, X, Bot, User } from "lucide-react";
 import { useAiCommand, type CommandResponse } from "@/lib/hooks/use-ai-command";
+import { ContactMentionPicker } from "./contact-mention-picker";
 
 interface Message {
     id: string;
@@ -13,10 +14,27 @@ interface Message {
     toolsUsed?: string[];
 }
 
+interface Contact {
+    id: string;
+    displayName: string;
+    emailAddresses: string[];
+    photoUrl?: string;
+    givenName: string;
+    familyName?: string;
+}
+
+interface MentionData {
+    [mentionText: string]: string; // Maps "@DisplayName" to contact ID
+}
+
 export function AiChatBox() {
     const [isExpanded, setIsExpanded] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
+    const [showMentionPicker, setShowMentionPicker] = useState(false);
+    const [mentionQuery, setMentionQuery] = useState("");
+    const [mentionStartPos, setMentionStartPos] = useState(0);
+    const [mentions, setMentions] = useState<MentionData>({});
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,7 +64,6 @@ export function AiChatBox() {
         return () => window.removeEventListener("keydown", handleGlobalKeyDown);
     }, []);
 
-    // ... existing focus effect ...
     // Focus input when expanded without scrolling
     useEffect(() => {
         if (isExpanded && inputRef.current) {
@@ -61,6 +78,71 @@ export function AiChatBox() {
         }
     }, [messages]);
 
+    // Detect "@" mentions in input
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setInput(value);
+
+        // Get cursor position
+        const cursorPos = e.target.selectionStart || 0;
+
+        // Find the last "@" before cursor
+        const textBeforeCursor = value.slice(0, cursorPos);
+        const lastAtIndex = textBeforeCursor.lastIndexOf("@");
+
+        if (lastAtIndex !== -1) {
+            // Check if "@" is at word boundary (start of string or preceded by space)
+            const charBeforeAt = lastAtIndex > 0 ? textBeforeCursor[lastAtIndex - 1] : " ";
+            const isWordBoundary = charBeforeAt === " " || charBeforeAt === "\n";
+
+            if (isWordBoundary) {
+                // Extract the query after "@"
+                const textAfterAt = textBeforeCursor.slice(lastAtIndex + 1);
+                // Check if there's a space after "@" (which would close the mention)
+                const hasSpace = textAfterAt.includes(" ");
+
+                if (!hasSpace) {
+                    setMentionQuery(textAfterAt);
+                    setMentionStartPos(lastAtIndex);
+                    setShowMentionPicker(true);
+                    return;
+                }
+            }
+        }
+
+        // Close picker if no valid "@" found
+        setShowMentionPicker(false);
+    };
+
+    // Handle contact selection from mention picker
+    const handleContactSelect = (contact: Contact) => {
+        const mentionText = `@${contact.displayName}`;
+
+        // Replace "@query" with the full mention
+        const beforeMention = input.slice(0, mentionStartPos);
+        const afterMention = input.slice(inputRef.current?.selectionStart || input.length);
+        const newInput = beforeMention + mentionText + " " + afterMention;
+
+        setInput(newInput);
+
+        // Store mention mapping
+        setMentions(prev => ({
+            ...prev,
+            [mentionText]: contact.id
+        }));
+
+        setShowMentionPicker(false);
+
+        // Refocus input and move cursor after mention
+        setTimeout(() => {
+            if (inputRef.current) {
+                const newCursorPos = beforeMention.length + mentionText.length + 1;
+                inputRef.current.focus();
+                inputRef.current.setSelectionRange(newCursorPos, newCursorPos);
+            }
+        }, 10);
+    };
+
     const handleSend = (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!input.trim() || isPending) return;
@@ -73,11 +155,25 @@ export function AiChatBox() {
         };
 
         setMessages((prev) => [...prev, userMessage]);
-        setInput("");
 
-        // Send to backend
+        // Extract mentioned contact IDs
+        const mentionedContactIds: string[] = [];
+        Object.entries(mentions).forEach(([mentionText, contactId]) => {
+            if (input.includes(mentionText)) {
+                mentionedContactIds.push(contactId);
+            }
+        });
+
+        // Clear input and mentions
+        setInput("");
+        setMentions({});
+
+        // Send to backend with mentioned contact IDs
         sendCommand(
-            { message: userMessage.content },
+            {
+                message: userMessage.content,
+                mentionedContactIds
+            },
             {
                 onSuccess: (response: CommandResponse) => {
                     const assistantMessage: Message = {
@@ -105,6 +201,11 @@ export function AiChatBox() {
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
+        // Don't handle Enter if mention picker is open
+        if (showMentionPicker) {
+            return;
+        }
+
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSend(e as any);
@@ -114,6 +215,48 @@ export function AiChatBox() {
     const clearHistory = () => {
         setMessages([]);
         sessionStorage.removeItem("ai-chat-messages");
+    };
+
+    // Render message content with styled mentions
+    const renderMessageContent = (content: string) => {
+        // Get all mention texts that were used in this message
+        const mentionTexts = Object.keys(mentions).filter(m => content.includes(m));
+
+        if (mentionTexts.length === 0) {
+            return content;
+        }
+
+        // Sort by position in content to handle multiple mentions correctly
+        const mentionPositions = mentionTexts.map(mention => ({
+            mention,
+            index: content.indexOf(mention)
+        })).sort((a, b) => a.index - b.index);
+
+        const parts: React.ReactElement[] = [];
+        let lastIndex = 0;
+
+        mentionPositions.forEach(({ mention, index }, i) => {
+            // Add text before mention
+            if (index > lastIndex) {
+                parts.push(<span key={`text-${i}`}>{content.slice(lastIndex, index)}</span>);
+            }
+
+            // Add bold mention
+            parts.push(
+                <span key={`mention-${i}`} className="font-bold">
+                    {mention}
+                </span>
+            );
+
+            lastIndex = index + mention.length;
+        });
+
+        // Add remaining text after last mention
+        if (lastIndex < content.length) {
+            parts.push(<span key="text-end">{content.slice(lastIndex)}</span>);
+        }
+
+        return <>{parts}</>;
     };
 
     return (
@@ -178,9 +321,9 @@ export function AiChatBox() {
                                             Try commands like:
                                         </p>
                                         <ul className="text-xs mt-2 space-y-1">
-                                            <li>&quot;add note to John: great meeting today&quot;</li>
-                                            <li>&quot;remind me to call Sarah tomorrow at 2pm&quot;</li>
-                                            <li>&quot;mark Patrick as high priority&quot;</li>
+                                            <li>&quot;add note to @John: great meeting today&quot;</li>
+                                            <li>&quot;remind me to call @Sarah tomorrow at 2pm&quot;</li>
+                                            <li>&quot;mark @Patrick as high priority&quot;</li>
                                         </ul>
                                     </div>
                                 ) : (
@@ -200,8 +343,9 @@ export function AiChatBox() {
                                                     : "bg-muted text-foreground"
                                                     }`}
                                             >
-                                                {/* {console.log('Rendering message:', message)} */}
-                                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                                <p className="text-sm whitespace-pre-wrap">
+                                                    {renderMessageContent(message.content)}
+                                                </p>
                                                 {message.toolsUsed && message.toolsUsed.length > 0 && (
                                                     <div className="mt-2 pt-2 border-t border-border/50">
                                                         <p className="text-xs opacity-70">
@@ -232,15 +376,30 @@ export function AiChatBox() {
                             </div>
 
                             {/* Input */}
-                            <div className="p-4 border-t border-border bg-background/50">
+                            <div className="p-4 border-t border-border bg-background/50 relative">
+                                {/* Mention Picker */}
+                                <AnimatePresence>
+                                    {showMentionPicker && (
+                                        <ContactMentionPicker
+                                            searchQuery={mentionQuery}
+                                            onSelect={handleContactSelect}
+                                            onClose={() => setShowMentionPicker(false)}
+                                            position={{
+                                                bottom: 60,
+                                                left: 0,
+                                            }}
+                                        />
+                                    )}
+                                </AnimatePresence>
+
                                 <div className="flex gap-2">
                                     <input
                                         ref={inputRef}
                                         type="text"
                                         value={input}
-                                        onChange={(e) => setInput(e.target.value)}
+                                        onChange={handleInputChange}
                                         onKeyDown={handleKeyDown}
-                                        placeholder="Type a command..."
+                                        placeholder="Type a command... (use @ to mention contacts)"
                                         disabled={isPending}
                                         className="flex-1 px-4 py-2 bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
                                     />

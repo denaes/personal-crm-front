@@ -22,9 +22,20 @@ export function useContacts(options?: {
         queryKey: ['contacts', options],
         queryFn: async () => {
             if (isSearch) {
+                console.log('[useContacts] Searching for:', options!.search!);
                 const response = await ContactsService.contactsControllerSearch(options!.search!);
-                // Unwrapping the response from the interceptor ({ success: true, data: [...], ... })
-                return response.data;
+                console.log('[useContacts] Search response:', response);
+                console.log('[useContacts] Search response.data:', response.data);
+                // Search returns data directly as ContactDto[]
+                // Wrap it in the same structure as findAll for consistency
+                const result = {
+                    data: response.data,
+                    total: response.data.length,
+                    page: 1,
+                    limit: response.data.length
+                };
+                console.log('[useContacts] Returning wrapped result:', result);
+                return result;
             }
 
             const response = await ContactsService.contactsControllerFindAll(

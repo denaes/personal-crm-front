@@ -4,6 +4,7 @@ import { AiCommandService } from '@/lib/api';
 export interface CommandRequest {
     message: string;
     conversationId?: string;
+    mentionedContactIds?: string[];
 }
 
 export interface CommandResponse {

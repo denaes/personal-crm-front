@@ -15,7 +15,7 @@ export default function TermsOfServicePage() {
                         <section>
                             <h2 className="text-xl font-semibold mb-3 text-foreground">1. Acceptance of Terms</h2>
                             <p>
-                                By accessing or using Renku (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
+                                By accessing or using Rinku (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
                             </p>
                         </section>
 
@@ -50,7 +50,7 @@ export default function TermsOfServicePage() {
                         <section>
                             <h2 className="text-xl font-semibold mb-3 text-foreground">6. Limitation of Liability</h2>
                             <p>
-                                In no event shall Renku be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of the Service.
+                                In no event shall Rinku be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your use of the Service.
                             </p>
                         </section>
                     </div>

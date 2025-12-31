@@ -12,8 +12,8 @@ export function useContacts(options?: {
     search?: string;
     priority?: 'low' | 'medium' | 'high';
     tags?: string;
-    sortBy?: string;
-    sortOrder?: string;
+    sortBy?: 'lastContactedAt' | 'updatedAt' | 'createdAt';
+    sortOrder?: 'ASC' | 'DESC';
 }) {
     // Determine if we are searching or listing
     const isSearch = !!options?.search;

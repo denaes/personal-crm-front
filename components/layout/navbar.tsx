@@ -62,7 +62,7 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
                         <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-white text-sm">
                             PC
                         </div>
-                        <span className="hidden sm:inline">Personal CRM</span>
+                        <span className="hidden sm:inline">Rinku</span>
                     </Link>
 
                     {/* Desktop Navigation */}

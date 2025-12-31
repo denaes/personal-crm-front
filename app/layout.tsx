@@ -24,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Personal CRM - AI-Powered Relationship Management",
+  title: "Rinku - Personal CRM - AI-Powered Relationship Management",
   description: "Manage your personal relationships with AI-powered insights and Google Contacts integration",
   keywords: ["CRM", "contacts", "relationship management", "AI", "productivity"],
 };

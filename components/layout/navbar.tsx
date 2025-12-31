@@ -21,7 +21,7 @@ const navigation = [
     { name: "Contacts", href: "/contacts", icon: Users },
     { name: "Interactions", href: "/interactions", icon: MessageSquare },
     { name: "Reminders", href: "/reminders", icon: Bell },
-    { name: "Settings", href: "/settings", icon: Settings },
+    // { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 interface NavbarProps {

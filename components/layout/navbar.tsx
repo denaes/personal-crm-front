@@ -13,6 +13,7 @@ import {
     LogOut,
     Menu,
     X,
+    Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ const navigation = [
     { name: "Contacts", href: "/contacts", icon: Users },
     { name: "Interactions", href: "/interactions", icon: MessageSquare },
     { name: "Reminders", href: "/reminders", icon: Bell },
+    { name: "Features", href: "/features", icon: Lightbulb },
     // { name: "Settings", href: "/settings", icon: Settings },
 ];
 

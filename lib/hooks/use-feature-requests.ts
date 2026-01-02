@@ -13,6 +13,7 @@ export function useFeatureRequests(
             const response = await FeatureRequestsService.featureRequestsControllerFindAll(
                 status,
                 tags,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 sortBy as any,
                 sortOrder
             );

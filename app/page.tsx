@@ -8,7 +8,6 @@ import {
     Brain,
     Calendar,
     ArrowRight,
-    Check,
     Zap,
     Target,
     MessageSquare,
@@ -99,8 +98,8 @@ export default function LandingPage() {
             {/* Navbar */}
             <nav
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                        ? "bg-background/80 backdrop-blur-md border-b border-border shadow-lg"
-                        : "bg-transparent"
+                    ? "bg-background/80 backdrop-blur-md border-b border-border shadow-lg"
+                    : "bg-transparent"
                     }`}
             >
                 <div className="container mx-auto px-6 py-4">
@@ -164,7 +163,7 @@ export default function LandingPage() {
                                 href="/login"
                                 className="group px-8 py-4 bg-gradient-primary text-white rounded-lg font-semibold text-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
                             >
-                                Start Now - It's Free
+                                Start Now - It&apos;s Free
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </div>

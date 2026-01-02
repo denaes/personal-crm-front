@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { CreateReminderDto, UpdateReminderDto } from "@/lib/api";
+import { UpdateReminderDto } from "@/lib/api";
 import { useCreateReminder, useUpdateReminder } from "@/lib/hooks/use-reminders";
 import { useContacts } from "@/lib/hooks/use-contacts";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ export function ReminderForm({ initialData, contactId, onSuccess }: ReminderForm
     const { mutate: createReminder, isPending: isCreating } = useCreateReminder();
     const { mutate: updateReminder, isPending: isUpdating } = useUpdateReminder();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { register, handleSubmit, formState: { errors } } = useForm<any>({
         defaultValues: {
             contactId: initialData?.contactId || contactId || "",
@@ -41,6 +42,7 @@ export function ReminderForm({ initialData, contactId, onSuccess }: ReminderForm
     const { data: contactsData } = useContacts({ limit: 100 });
     const contacts = contactsData?.data || [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onSubmit = (data: any) => {
         const payload = {
             ...data,
@@ -79,6 +81,7 @@ export function ReminderForm({ initialData, contactId, onSuccess }: ReminderForm
                     disabled={!!contactId || isEditing}
                 >
                     <option value="">Select a contact...</option>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {contacts.map((contact: any) => (
                         <option key={contact.id} value={contact.id}>
                             {contact.displayName || `${contact.givenName} ${contact.familyName}`}

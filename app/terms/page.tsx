@@ -15,7 +15,7 @@ export default function TermsOfServicePage() {
                         <section>
                             <h2 className="text-xl font-semibold mb-3 text-foreground">1. Acceptance of Terms</h2>
                             <p>
-                                By accessing or using Rinku (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
+                                By accessing or using Rinku (the &quot;Service&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.
                             </p>
                         </section>
 
@@ -43,7 +43,7 @@ export default function TermsOfServicePage() {
                         <section>
                             <h2 className="text-xl font-semibold mb-3 text-foreground">5. Disclaimer</h2>
                             <p>
-                                The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranties, expressed or implied, regarding the operation of the Service or the accuracy of the data.
+                                The Service is provided on an &quot;AS IS&quot; and &quot;AS AVAILABLE&quot; basis. We make no warranties, expressed or implied, regarding the operation of the Service or the accuracy of the data.
                             </p>
                         </section>
 

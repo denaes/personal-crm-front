@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { User } from "lucide-react";
+import { motion } from "framer-motion";
+
 import { useContacts } from "@/lib/hooks/use-contacts";
 import { getInitials } from "@/lib/utils";
 
@@ -155,6 +155,7 @@ export function ContactMentionPicker({
                     >
                         <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-sm font-semibold shrink-0">
                             {contact.photoUrl ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
                                 <img
                                     src={contact.photoUrl}
                                     alt={contact.displayName}

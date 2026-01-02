@@ -47,7 +47,7 @@ export default function FeaturesPage() {
     }
 
     // Pass functions directly as they are stable (declared within component but rely on stable deps or we explicitly ignore deps issue if we want, but better to just let useMemo handle it by passing them as deps)
-    const columns = useMemo(() => getColumns(updateStatus, updateTags), [updateStatus, updateTags])
+    const columns = useMemo(() => getColumns(updateStatus, updateTags), [getColumns, updateStatus, updateTags])
 
     if (isLoading) {
         return <div>Loading features...</div>

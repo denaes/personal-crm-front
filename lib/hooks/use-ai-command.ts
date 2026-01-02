@@ -10,6 +10,7 @@ export interface CommandRequest {
 export interface CommandResponse {
     success: boolean;
     message: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: any;
     toolsUsed?: string[];
     conversationId?: string;
@@ -21,7 +22,6 @@ export interface CommandResponse {
 
 async function sendAiCommand(request: CommandRequest): Promise<CommandResponse> {
     const result = await AiCommandService.aiCommandControllerProcessCommand(request);
-    // @ts-ignore
     return result.data || result;
 }
 

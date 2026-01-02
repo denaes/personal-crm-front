@@ -11,7 +11,7 @@ export function useInteractions() {
         queryKey: ["interactions"],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindAll();
-            // @ts-ignore
+            // @ts-expect-error: API response type mismatch
             return result.data || result;
         },
     });
@@ -25,7 +25,7 @@ export function useInteractionsByContact(contactId: string) {
         queryKey: ["interactions", "contact", contactId],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindByContact(contactId);
-            // @ts-ignore
+            // @ts-expect-error: API response type mismatch
             return result.data || result;
         },
         enabled: !!contactId,
@@ -40,7 +40,7 @@ export function useInteraction(id: string) {
         queryKey: ["interaction", id],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindOne(id);
-            // @ts-ignore
+            // @ts-expect-error: API response type mismatch
             return result.data || result;
         },
         enabled: !!id,
@@ -56,7 +56,7 @@ export function useCreateInteraction() {
     return useMutation({
         mutationFn: async (data: CreateInteractionDto) => {
             const result = await InteractionsService.interactionsControllerCreate(data);
-            // @ts-ignore
+            // @ts-expect-error: API response type mismatch
             return result.data || result;
         },
         onSuccess: () => {
@@ -74,7 +74,7 @@ export function useUpdateInteraction() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateInteractionDto }) => {
             const result = await InteractionsService.interactionsControllerUpdate(id, data);
-            // @ts-ignore
+            // @ts-expect-error: API response type mismatch
             return result.data || result;
         },
         onSuccess: (_, variables) => {

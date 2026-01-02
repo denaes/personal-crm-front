@@ -299,6 +299,8 @@ function InlineInteractionForm({ contactId }: { contactId: string }) {
 
         createInteraction({
             contactId,
+
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: type as any,
             content,
             occurredAt: new Date(occurredAt).toISOString(),
@@ -384,6 +386,7 @@ function InlineReminderForm({ contactId }: { contactId: string }) {
 
         createReminder({
             contactId,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: 'follow_up' as any,
             message,
             scheduledFor: new Date(date).toISOString(),

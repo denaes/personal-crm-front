@@ -8,7 +8,6 @@ import {
     Users,
     MessageSquare,
     Bell,
-    Settings,
     Search,
     LogOut,
     Menu,

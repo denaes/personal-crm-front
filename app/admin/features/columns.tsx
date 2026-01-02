@@ -36,7 +36,7 @@ export type FeatureRequest = {
     createdAt: string
 }
 
-const TagsCell = ({ row, updateTags }: { row: { getValue: (key: string) => any; original: FeatureRequest }, updateTags: (id: string, tags: string[]) => Promise<void> }) => {
+const TagsCell = ({ row, updateTags }: { row: { getValue: (key: string) => unknown; original: FeatureRequest }, updateTags: (id: string, tags: string[]) => Promise<void> }) => {
     const tags = (row.getValue("tags") || []) as string[]
     const [isUpdating, setIsUpdating] = useState(false)
     const [newTag, setNewTag] = useState("")
@@ -106,7 +106,7 @@ const TagsCell = ({ row, updateTags }: { row: { getValue: (key: string) => any; 
     )
 }
 
-const StatusCell = ({ row, updateStatus }: { row: { getValue: (key: string) => any; original: FeatureRequest }, updateStatus: (id: string, status: string) => Promise<void> }) => {
+const StatusCell = ({ row, updateStatus }: { row: { getValue: (key: string) => unknown; original: FeatureRequest }, updateStatus: (id: string, status: string) => Promise<void> }) => {
     const status = row.getValue("status") as string
     const [isUpdating, setIsUpdating] = useState(false)
 

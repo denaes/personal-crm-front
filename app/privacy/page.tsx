@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
                         <section>
                             <h2 className="text-xl font-semibold mb-3 text-foreground">1. Overview</h2>
                             <p>
-                                Rinku ("we", "our", or "us") respects your privacy. This Privacy Policy explains how we collect, use, and store information when you use our Personal CRM application.
+                                Rinku (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) respects your privacy. This Privacy Policy explains how we collect, use, and store information when you use our Personal CRM application.
                             </p>
                         </section>
 

@@ -3,9 +3,9 @@
 import { useInteractions, useDeleteInteraction } from "@/lib/hooks/use-interactions";
 import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
-import { Plus, MessageSquare } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import { format } from "date-fns";
+
 import { useRouter } from "next/navigation";
 import { InteractionsTable } from "@/components/interactions/interactions-table";
 
@@ -16,6 +16,7 @@ export default function InteractionsPage() {
     const { mutate: deleteInteraction } = useDeleteInteraction();
 
     const sortedInteractions = Array.isArray(interactions)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ? [...interactions].sort((a: any, b: any) =>
             new Date(b.occurredAt || b.createdAt).getTime() - new Date(a.occurredAt || a.createdAt).getTime()
         )

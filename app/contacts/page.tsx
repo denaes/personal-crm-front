@@ -4,23 +4,17 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
     Search,
-    Filter,
     Grid3x3,
     List,
-    Plus,
     Mail,
     Phone,
-    Tag,
-    SortAsc,
     RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import { useContacts, useSyncContacts } from "@/lib/hooks/use-contacts";
-import { useInteractions } from "@/lib/hooks/use-interactions";
+
 import { getInitials } from "@/lib/utils";
 import { AppLayout } from "@/components/layout/app-layout";
-import { InteractionsTable } from "@/components/interactions/interactions-table";
-import { useRouter } from "next/navigation";
 
 type ViewMode = "grid" | "list";
 
@@ -37,9 +31,8 @@ export default function ContactsPage() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    const router = useRouter();
     // Fetch real contacts from API
-    const { data: contactsData, isLoading, error, isFetching } = useContacts({
+    const { data: contactsData, isLoading, error } = useContacts({
         search: debouncedSearch || undefined,
         sortBy: 'updatedAt',
         sortOrder: 'DESC'
@@ -52,8 +45,6 @@ export default function ContactsPage() {
 
     // Valid contacts for display (backend handles filtering now)
     const displayedContacts = contacts;
-
-    // ... existing filter logic removed ...
 
     return (
         <AppLayout>
@@ -121,8 +112,10 @@ export default function ContactsPage() {
                                     <h2 className="font-display text-xl font-semibold mb-4">Recently Updated</h2>
                                     <div className="flex gap-6 overflow-x-auto pb-6 -mx-6 px-6 scrollbar-hide">
                                         {(recentContacts?.data || [])
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             .filter((c: any) => c.lastContactedAt || c.updatedAt)
                                             .slice(0, 10)
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             .map((contact: any, index: number) => (
                                                 <Link
                                                     href={`/contacts/${contact.id}`}
@@ -138,6 +131,7 @@ export default function ContactsPage() {
                                                         <div className="flex items-center gap-4 mb-3">
                                                             <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform duration-300 overflow-hidden shrink-0">
                                                                 {contact.photoUrl ? (
+                                                                    /* eslint-disable-next-line @next/next/no-img-element */
                                                                     <img src={contact.photoUrl} alt={contact.displayName} className="w-full h-full object-cover" />
                                                                 ) : (
                                                                     getInitials(`${contact.givenName} ${contact.familyName}`)
@@ -189,6 +183,7 @@ export default function ContactsPage() {
 
                                     {viewMode === "grid" ? (
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                             {displayedContacts.map((contact: any, index: number) => (
                                                 <Link
                                                     href={`/contacts/${contact.id}`}
@@ -204,6 +199,7 @@ export default function ContactsPage() {
                                                         <div className="flex justify-center mb-4">
                                                             <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-white font-bold text-xl group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                                                                 {contact.photoUrl ? (
+                                                                    /* eslint-disable-next-line @next/next/no-img-element */
                                                                     <img src={contact.photoUrl} alt={contact.displayName} className="w-full h-full object-cover" />
                                                                 ) : (
                                                                     getInitials(`${contact.givenName} ${contact.familyName}`)
@@ -269,6 +265,7 @@ export default function ContactsPage() {
                                     ) : (
                                         <div className="glass-effect rounded-2xl border border-border overflow-hidden">
                                             <div className="divide-y divide-border">
+                                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                                 {displayedContacts.map((contact: any, index: number) => (
                                                     <Link href={`/contacts/${contact.id}`} key={contact.id}>
                                                         <motion.div
@@ -280,6 +277,7 @@ export default function ContactsPage() {
                                                             {/* Avatar */}
                                                             <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white font-semibold group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                                                                 {contact.photoUrl ? (
+                                                                    /* eslint-disable-next-line @next/next/no-img-element */
                                                                     <img src={contact.photoUrl} alt={contact.displayName} className="w-full h-full object-cover" />
                                                                 ) : (
                                                                     getInitials(`${contact.givenName} ${contact.familyName}`)

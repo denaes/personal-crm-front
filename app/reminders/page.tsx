@@ -26,6 +26,7 @@ export default function RemindersPage() {
     const list = Array.isArray(displayedReminders) ? displayedReminders : [];
 
     // Sort by due date (Active: ascending, Past: descending)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sortedReminders = [...list].sort((a: any, b: any) => {
         const dateA = new Date(a.scheduledFor || a.createdAt).getTime();
         const dateB = new Date(b.scheduledFor || b.createdAt).getTime();
@@ -87,6 +88,7 @@ export default function RemindersPage() {
                             </div>
                         ) : (
                             <div className="divide-y divide-border">
+                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                 {sortedReminders.map((reminder: any) => (
                                     <div key={reminder.id} className="p-4 hover:bg-muted/30 transition-colors flex items-start gap-4 group">
                                         <div className="mt-1 p-2 bg-primary/10 rounded-lg text-primary">

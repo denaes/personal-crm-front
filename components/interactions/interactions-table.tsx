@@ -24,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuTrigger,
     DropdownMenuSeparator,
     DropdownMenuLabel,
@@ -33,6 +32,7 @@ import {
 
 
 interface InteractionsTableProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     interactions: any[];
     onDelete: (id: string) => void;
     onEdit: (id: string) => void;
@@ -246,6 +246,7 @@ export function InteractionsTable({ interactions, onDelete, onEdit, showContactC
                                                 >
                                                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
                                                         {interaction.contact.photoUrl ? (
+                                                            /* eslint-disable-next-line @next/next/no-img-element */
                                                             <img src={interaction.contact.photoUrl} alt="" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <span className="text-xs font-medium text-muted-foreground">

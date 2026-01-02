@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { CreateInteractionDto, UpdateInteractionDto } from "@/lib/api";
+import { UpdateInteractionDto } from "@/lib/api";
 import { useCreateInteraction, useUpdateInteraction } from "@/lib/hooks/use-interactions";
 import { useContacts } from "@/lib/hooks/use-contacts";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,7 @@ export function InteractionForm({ initialData, contactId, onSuccess }: Interacti
     const { mutate: createInteraction, isPending: isCreating } = useCreateInteraction();
     const { mutate: updateInteraction, isPending: isUpdating } = useUpdateInteraction();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<any>({
         defaultValues: {
             contactId: initialData?.contactId || contactId || "",
@@ -48,6 +49,7 @@ export function InteractionForm({ initialData, contactId, onSuccess }: Interacti
     const rawContacts = contactsData?.data;
     const contacts = Array.isArray(rawContacts) ? rawContacts : [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const onSubmit = (data: any) => {
         const payload = {
             ...data,
@@ -88,7 +90,9 @@ export function InteractionForm({ initialData, contactId, onSuccess }: Interacti
                     ) : (
                         <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
                             {/* Show selected contact name if possible, or just 'Locked' */}
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                             {contacts.find((c: any) => c.id === (contactId || initialData?.contactId))?.displayName ||
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 contacts.find((c: any) => c.id === (contactId || initialData?.contactId))?.givenName ||
                                 "Selected Contact"}
                         </div>
@@ -167,6 +171,7 @@ function SearchableContactSelect({ onSelect, error }: { onSelect: (id: string) =
 
     // Simple Outside Click handler could be added here, but for MVP standard logic:
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleSelect = (contact: any) => {
         onSelect(contact.id);
         setSelectedName(contact.displayName || `${contact.givenName} ${contact.familyName}`);
@@ -203,6 +208,7 @@ function SearchableContactSelect({ onSelect, error }: { onSelect: (id: string) =
                     ) : contacts.length === 0 ? (
                         <div className="p-2 text-sm text-muted-foreground">No contacts found.</div>
                     ) : (
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         contacts.map((contact: any) => (
                             <div
                                 key={contact.id}

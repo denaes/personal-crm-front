@@ -208,6 +208,7 @@ export function AiChatBox() {
 
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             handleSend(e as any);
         }
     };
@@ -219,44 +220,24 @@ export function AiChatBox() {
 
     // Render message content with styled mentions
     const renderMessageContent = (content: string) => {
-        // Get all mention texts that were used in this message
-        const mentionTexts = Object.keys(mentions).filter(m => content.includes(m));
+        const mentionRegex = /@[\w\s]+/g;
+        const parts = content.split(mentionRegex);
+        const matches = content.match(mentionRegex) || [];
 
-        if (mentionTexts.length === 0) {
-            return content;
-        }
-
-        // Sort by position in content to handle multiple mentions correctly
-        const mentionPositions = mentionTexts.map(mention => ({
-            mention,
-            index: content.indexOf(mention)
-        })).sort((a, b) => a.index - b.index);
-
-        const parts: React.ReactElement[] = [];
-        let lastIndex = 0;
-
-        mentionPositions.forEach(({ mention, index }, i) => {
-            // Add text before mention
-            if (index > lastIndex) {
-                parts.push(<span key={`text-${i}`}>{content.slice(lastIndex, index)}</span>);
-            }
-
-            // Add bold mention
-            parts.push(
-                <span key={`mention-${i}`} className="font-bold">
-                    {mention}
-                </span>
-            );
-
-            lastIndex = index + mention.length;
-        });
-
-        // Add remaining text after last mention
-        if (lastIndex < content.length) {
-            parts.push(<span key="text-end">{content.slice(lastIndex)}</span>);
-        }
-
-        return <>{parts}</>;
+        return (
+            <>
+                {parts.map((part, i) => (
+                    <span key={i}>
+                        {part}
+                        {matches[i] && (
+                            <span className="text-primary font-semibold">
+                                {matches[i]}
+                            </span>
+                        )}
+                    </span>
+                ))}
+            </>
+        );
     };
 
     return (

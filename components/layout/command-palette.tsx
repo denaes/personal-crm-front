@@ -139,6 +139,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             // Filter locally if awaiting debounce (optional, but smoother UI)
             // .filter((c: any) => !search || (c.displayName || "").toLowerCase().includes(query))
             .slice(0, 5)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .map((contact: any) => ({
                 id: `contact-${contact.id}`,
                 title: contact.displayName || `${contact.givenName} ${contact.familyName}`,
@@ -353,6 +354,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractJob(contact: any): string | undefined {
     return contact.organizations?.[0]?.title;
 }

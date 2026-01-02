@@ -144,7 +144,7 @@ export default function FeaturesPage() {
                             Feature <span className="gradient-text">Roadmap</span>
                         </h1>
                         <p className="text-muted-foreground text-lg">
-                            Vote for features you'd like to see and submit your own
+                            Vote for features you&apos;d like to see and submit your own
                             ideas
                         </p>
                     </div>

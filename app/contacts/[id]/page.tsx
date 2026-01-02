@@ -26,6 +26,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { InteractionsTable } from "@/components/interactions/interactions-table";
 
 export default function ContactDetailsPage() {
     const router = useRouter();
@@ -232,54 +233,12 @@ export default function ContactDetailsPage() {
                                     </h2>
                                 </div>
 
-                                <div className="relative pl-8 border-l-2 border-muted space-y-8">
-                                    {interactionsLoading ? (
-                                        <div className="animate-pulse space-y-4">
-                                            <div className="h-24 bg-muted rounded-xl" />
-                                            <div className="h-24 bg-muted rounded-xl" />
-                                        </div>
-                                    ) : !sortedInteractions || sortedInteractions.length === 0 ? (
-                                        <div className="text-center py-12 text-muted-foreground ml-[-32px]">
-                                            <p>No interactions logged yet.</p>
-                                            <p className="text-xs mt-1">Start tracking your relationship history!</p>
-                                        </div>
-                                    ) : (
-                                        sortedInteractions.map((interaction: any, index: number) => (
-                                            <motion.div
-                                                key={interaction.id}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: index * 0.1 }}
-                                                className="relative group"
-                                            >
-                                                {/* Timeline Dot */}
-                                                <div className="absolute -left-[41px] top-4 w-5 h-5 rounded-full border-4 border-background bg-primary" />
-
-                                                <div className="bg-muted/30 p-4 rounded-xl hover:bg-muted/50 transition-colors">
-                                                    <div className="flex items-center justify-between mb-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                                                {interaction.type}
-                                                            </span>
-                                                            <span className="text-xs text-muted-foreground">
-                                                                • {format(new Date(interaction.occurredAt || interaction.createdAt), 'PPP')}
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => router.push(`/interactions/${interaction.id}/edit`)}>
-                                                                <Pencil className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-                                                            </Button>
-                                                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleDeleteInteraction(interaction.id)}>
-                                                                <Trash className="w-3 h-3 text-muted-foreground hover:text-destructive" />
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-sm font-medium whitespace-pre-wrap">{interaction.content || interaction.description || interaction.notes}</p>
-                                                </div>
-                                            </motion.div>
-                                        ))
-                                    )}
-                                </div>
+                                <InteractionsTable
+                                    interactions={interactions || []}
+                                    onEdit={(id) => router.push(`/interactions/${id}/edit`)}
+                                    onDelete={handleDeleteInteraction}
+                                    showContactColumn={false}
+                                />
                             </section>
                         </div>
                     </div>

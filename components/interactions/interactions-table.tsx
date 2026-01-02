@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import {
     MessageSquare,
@@ -10,15 +11,32 @@ import {
     Calendar,
     Pencil,
     Trash,
-    StickyNote
+    StickyNote,
+    Search,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
+    Filter
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+    DropdownMenuLabel,
+    DropdownMenuCheckboxItem
+} from "@/components/ui/dropdown-menu";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface InteractionsTableProps {
     interactions: any[];
     onDelete: (id: string) => void;
     onEdit: (id: string) => void;
+    showContactColumn?: boolean;
 }
 
 const getTypeIcon = (type: string) => {
@@ -42,7 +60,82 @@ const getInitials = (name: string) => {
         .slice(0, 2);
 };
 
-export function InteractionsTable({ interactions, onDelete, onEdit }: InteractionsTableProps) {
+type SortField = 'date' | 'type' | 'contact';
+type SortDirection = 'asc' | 'desc';
+
+export function InteractionsTable({ interactions, onDelete, onEdit, showContactColumn = true }: InteractionsTableProps) {
+    const [searchQuery, setSearchQuery] = useState("");
+    const [typeFilter, setTypeFilter] = useState("all");
+    const [sortField, setSortField] = useState<SortField>('date');
+    const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+
+    const filteredAndSortedInteractions = useMemo(() => {
+        let result = [...interactions];
+
+        // Filter by type
+        if (typeFilter !== "all") {
+            result = result.filter(i => i.type === typeFilter);
+        }
+
+        // Search filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            result = result.filter(i =>
+                (i.content || "").toLowerCase().includes(query) ||
+                (showContactColumn && (i.contact?.displayName || "").toLowerCase().includes(query)) ||
+                (i.type || "").toLowerCase().includes(query)
+            );
+        }
+
+        // Sorting
+        result.sort((a, b) => {
+            let valA, valB;
+
+            switch (sortField) {
+                case 'date':
+                    valA = new Date(a.occurredAt || a.createdAt).getTime();
+                    valB = new Date(b.occurredAt || b.createdAt).getTime();
+                    break;
+                case 'type':
+                    valA = a.type || "";
+                    valB = b.type || "";
+                    break;
+                case 'contact':
+                    if (showContactColumn) {
+                        valA = a.contact?.displayName || "";
+                        valB = b.contact?.displayName || "";
+                    } else {
+                        return 0;
+                    }
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+            if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return result;
+    }, [interactions, searchQuery, typeFilter, sortField, sortDirection, showContactColumn]);
+
+    const handleSort = (field: SortField) => {
+        if (sortField === field) {
+            setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
+        }
+    };
+
+    const SortIcon = ({ field }: { field: SortField }) => {
+        if (sortField !== field) return <ArrowUpDown className="w-4 h-4 ml-1 text-muted-foreground/50" />;
+        return sortDirection === 'asc'
+            ? <ArrowUp className="w-4 h-4 ml-1 text-primary" />
+            : <ArrowDown className="w-4 h-4 ml-1 text-primary" />;
+    };
+
     if (!interactions.length) {
         return (
             <div className="p-12 text-center border rounded-lg bg-muted/10">
@@ -54,86 +147,158 @@ export function InteractionsTable({ interactions, onDelete, onEdit }: Interactio
     }
 
     return (
-        <div className="rounded-md border bg-card">
-            <table className="w-full text-sm text-left">
-                <thead className="bg-muted/50 text-muted-foreground font-medium border-b">
-                    <tr>
-                        <th className="h-10 px-4 w-[180px]">Date</th>
-                        <th className="h-10 px-4 w-[120px]">Type</th>
-                        <th className="h-10 px-4 w-[250px]">Contact</th>
-                        <th className="h-10 px-4">Content</th>
-                        <th className="h-10 px-4 w-[100px]">Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y">
-                    {interactions.map((interaction) => (
-                        <tr key={interaction.id} className="hover:bg-muted/30 transition-colors group">
-                            <td className="p-4 whitespace-nowrap text-muted-foreground">
-                                {format(new Date(interaction.occurredAt || interaction.createdAt), 'MMM d, yyyy h:mm a')}
-                            </td>
-                            <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                    <div className="p-1.5 bg-background rounded-md border shadow-sm">
-                                        {getTypeIcon(interaction.type)}
-                                    </div>
-                                    <span className="capitalize">{interaction.type}</span>
+        <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-[300px]">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search interactions..."
+                            value={searchQuery}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                            className="pl-9"
+                        />
+                    </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon" className="shrink-0">
+                                <Filter className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[200px]">
+                            <DropdownMenuLabel>Filter by Type</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuCheckboxItem checked={typeFilter === 'all'} onCheckedChange={() => setTypeFilter('all')}>
+                                All Types
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem checked={typeFilter === 'call'} onCheckedChange={() => setTypeFilter('call')}>
+                                Calls
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem checked={typeFilter === 'email'} onCheckedChange={() => setTypeFilter('email')}>
+                                Emails
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem checked={typeFilter === 'meeting'} onCheckedChange={() => setTypeFilter('meeting')}>
+                                Meetings
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuCheckboxItem checked={typeFilter === 'note'} onCheckedChange={() => setTypeFilter('note')}>
+                                Notes
+                            </DropdownMenuCheckboxItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
+
+            <div className="rounded-md border bg-card">
+                <table className="w-full text-sm text-left">
+                    <thead className="bg-muted/50 text-muted-foreground font-medium border-b">
+                        <tr>
+                            <th className="h-10 px-4 w-[180px] cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('date')}>
+                                <div className="flex items-center">
+                                    Date
+                                    <SortIcon field="date" />
                                 </div>
-                            </td>
-                            <td className="p-4">
-                                {interaction.contact ? (
-                                    <Link
-                                        href={`/contacts/${interaction.contact.id}`}
-                                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                                    >
-                                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
-                                            {interaction.contact.photoUrl ? (
-                                                <img src={interaction.contact.photoUrl} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <span className="text-xs font-medium text-muted-foreground">
-                                                    {getInitials(interaction.contact.displayName)}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="font-medium truncate max-w-[180px]">
-                                            {interaction.contact.displayName}
-                                        </div>
-                                    </Link>
-                                ) : (
-                                    <div className="text-muted-foreground italic flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
-                                            <span className="text-xs font-medium text-muted-foreground">?</span>
-                                        </div>
-                                        Unknown
+                            </th>
+                            <th className="h-10 px-4 w-[120px] cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('type')}>
+                                <div className="flex items-center">
+                                    Type
+                                    <SortIcon field="type" />
+                                </div>
+                            </th>
+                            {showContactColumn && (
+                                <th className="h-10 px-4 w-[250px] cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => handleSort('contact')}>
+                                    <div className="flex items-center">
+                                        Contact
+                                        <SortIcon field="contact" />
                                     </div>
-                                )}
-                            </td>
-                            <td className="p-4 max-w-[400px]">
-                                <p className="truncate text-muted-foreground" title={interaction.content || interaction.notes}>
-                                    {interaction.content || interaction.notes || "No content"}
-                                </p>
-                            </td>
-                            <td className="p-4 text-right whitespace-nowrap">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => onEdit(interaction.id)}
-                                    title="Edit"
-                                >
-                                    <Pencil className="w-4 h-4 text-muted-foreground hover:text-foreground" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => onDelete(interaction.id)}
-                                    title="Delete"
-                                >
-                                    <Trash className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                                </Button>
-                            </td>
+                                </th>
+                            )}
+                            <th className="h-10 px-4">Content</th>
+                            <th className="h-10 px-4 w-[100px]">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody className="divide-y">
+                        {filteredAndSortedInteractions.length === 0 ? (
+                            <tr>
+                                <td colSpan={showContactColumn ? 5 : 4} className="p-8 text-center text-muted-foreground">
+                                    No interactions match your filters.
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredAndSortedInteractions.map((interaction) => (
+                                <tr key={interaction.id} className="hover:bg-muted/30 transition-colors group">
+                                    <td className="p-4 whitespace-nowrap text-muted-foreground">
+                                        {format(new Date(interaction.occurredAt || interaction.createdAt), 'MMM d, yyyy h:mm a')}
+                                    </td>
+                                    <td className="p-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className="p-1.5 bg-background rounded-md border shadow-sm">
+                                                {getTypeIcon(interaction.type)}
+                                            </div>
+                                            <span className="capitalize">{interaction.type}</span>
+                                        </div>
+                                    </td>
+                                    {showContactColumn && (
+                                        <td className="p-4">
+                                            {interaction.contact ? (
+                                                <Link
+                                                    href={`/contacts/${interaction.contact.id}`}
+                                                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                                                >
+                                                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
+                                                        {interaction.contact.photoUrl ? (
+                                                            <img src={interaction.contact.photoUrl} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <span className="text-xs font-medium text-muted-foreground">
+                                                                {getInitials(interaction.contact.displayName)}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="font-medium truncate max-w-[180px]">
+                                                        {interaction.contact.displayName}
+                                                    </div>
+                                                </Link>
+                                            ) : (
+                                                <div className="text-muted-foreground italic flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
+                                                        <span className="text-xs font-medium text-muted-foreground">?</span>
+                                                    </div>
+                                                    Unknown
+                                                </div>
+                                            )}
+                                        </td>
+                                    )}
+                                    <td className="p-4 max-w-[400px]">
+                                        <p className="truncate text-muted-foreground" title={interaction.content || interaction.notes}>
+                                            {interaction.content || interaction.notes || "No content"}
+                                        </p>
+                                    </td>
+                                    <td className="p-4 text-right whitespace-nowrap">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => onEdit(interaction.id)}
+                                            title="Edit"
+                                        >
+                                            <Pencil className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => onDelete(interaction.id)}
+                                            title="Delete"
+                                        >
+                                            <Trash className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            <div className="text-xs text-muted-foreground text-center">
+                Showing {filteredAndSortedInteractions.length} of {interactions.length} interactions
+            </div>
         </div>
     );
 }

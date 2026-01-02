@@ -15,6 +15,7 @@ import {
     X,
     Lightbulb,
 } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -61,9 +62,13 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
                         href="/dashboard"
                         className="flex items-center gap-2 font-display text-xl font-bold"
                     >
-                        <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-white text-sm">
-                            PC
-                        </div>
+                        <Image
+                            src="/logo.png"
+                            alt="Rinku Logo"
+                            width={32}
+                            height={32}
+                            className="rounded-lg"
+                        />
                         <span className="hidden sm:inline">Rinku</span>
                     </Link>
 

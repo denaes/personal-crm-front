@@ -32,3 +32,15 @@ export const removeAuthToken = () => {
         localStorage.removeItem('auth_token');
     }
 };
+
+import axios from 'axios';
+
+export const api = axios.create(API_CONFIG);
+
+api.interceptors.request.use((config) => {
+    const token = getAuthToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});

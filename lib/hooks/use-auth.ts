@@ -33,8 +33,10 @@ export function useCurrentUser() {
             try {
                 setLoading(true);
                 // Fetch user profile from backend
-                const profile = await UsersService.usersControllerGetCurrentUser();
-                setUser(profile as any);
+                const response = await UsersService.usersControllerGetCurrentUser();
+                // Handle wrapped response from TransformInterceptor
+                const user = response.data || response;
+                setUser(user);
             } catch (error) {
                 console.error("Failed to fetch user profile:", error);
                 setUser(null);

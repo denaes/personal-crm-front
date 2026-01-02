@@ -14,9 +14,11 @@ import {
     Menu,
     X,
     Lightbulb,
+    Shield,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/lib/stores/auth-store";
 
 const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -34,6 +36,8 @@ interface NavbarProps {
 export function Navbar({ onSearchOpen }: NavbarProps) {
     const pathname = usePathname();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { user } = useAuthStore();
+    const isAdmin = user?.role === 'admin';
 
     // Close mobile menu when route changes
     useEffect(() => {
@@ -74,6 +78,20 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-1">
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+                                    pathname.startsWith("/admin")
+                                        ? "bg-primary text-primary-foreground"
+                                        : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                                )}
+                            >
+                                <Shield className="w-4 h-4" />
+                                <span className="text-sm font-medium">Super Admin</span>
+                            </Link>
+                        )}
                         {navigation.map((item) => {
                             const isActive = pathname === item.href;
                             return (
@@ -137,6 +155,21 @@ export function Navbar({ onSearchOpen }: NavbarProps) {
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
                     <div className="md:hidden py-4 space-y-1">
+                        {isAdmin && (
+                            <Link
+                                href="/admin"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={cn(
+                                    "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                                    pathname.startsWith("/admin")
+                                        ? "bg-primary text-primary-foreground"
+                                        : "hover:bg-muted text-muted-foreground"
+                                )}
+                            >
+                                <Shield className="w-5 h-5" />
+                                <span className="font-medium">Super Admin</span>
+                            </Link>
+                        )}
                         {navigation.map((item) => {
                             const isActive = pathname === item.href;
                             return (

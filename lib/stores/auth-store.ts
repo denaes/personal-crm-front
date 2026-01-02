@@ -5,6 +5,7 @@ interface User {
     email: string;
     name: string;
     photoUrl?: string;
+    role?: 'user' | 'admin';
 }
 
 interface AuthStore {

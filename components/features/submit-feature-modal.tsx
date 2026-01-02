@@ -55,7 +55,12 @@ export function SubmitFeatureModal({ isOpen, onClose }: SubmitFeatureModalProps)
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-background border border-border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} onKeyDown={(e) => {
+                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSubmit(e);
+                    }
+                }}>
                     {/* Header */}
                     <div className="sticky top-0 bg-background border-b border-border p-6 flex items-center justify-between">
                         <h2 className="text-2xl font-bold font-display">
@@ -79,6 +84,7 @@ export function SubmitFeatureModal({ isOpen, onClose }: SubmitFeatureModalProps)
                             </label>
                             <input
                                 type="text"
+                                autoFocus
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 placeholder="e.g., Add dark mode to dashboard"

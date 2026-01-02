@@ -6,21 +6,17 @@ import { useInteractionsByContact, useCreateInteraction, useDeleteInteraction } 
 import { useRemindersByContact, useCreateReminder, useDeleteReminder } from "@/lib/hooks/use-reminders";
 import { AppLayout } from "@/components/layout/app-layout";
 import { getInitials, cn, formatDateWithOrdinal } from "@/lib/utils";
-import { format } from "date-fns";
+
 import {
     Mail,
     Phone,
     Calendar,
-    MapPin,
     Tag,
-    MessageSquare,
     Bell,
-    Plus,
     Clock,
     ArrowLeft,
     Trash,
-    Pencil,
-    Check
+    MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -34,7 +30,7 @@ export default function ContactDetailsPage() {
     const id = params?.id as string;
 
     const { data: contact, isLoading: contactLoading } = useContact(id);
-    const { data: interactions, isLoading: interactionsLoading } = useInteractionsByContact(id);
+    const { data: interactions } = useInteractionsByContact(id);
     const { data: reminders, isLoading: remindersLoading } = useRemindersByContact(id);
     const { mutate: deleteInteraction } = useDeleteInteraction();
     const { mutate: deleteReminder } = useDeleteReminder();
@@ -62,12 +58,7 @@ export default function ContactDetailsPage() {
         );
     }
 
-    // Sort interactions by date (descending)
-    const sortedInteractions = Array.isArray(interactions)
-        ? [...interactions].sort((a: any, b: any) =>
-            new Date(b.occurredAt || b.createdAt).getTime() - new Date(a.occurredAt || a.createdAt).getTime()
-        )
-        : [];
+
 
     const handleDeleteInteraction = (interactionId: string) => {
         if (confirm("Delete this interaction?")) {
@@ -97,6 +88,7 @@ export default function ContactDetailsPage() {
                                 className="relative w-24 h-24 rounded-full bg-gradient-primary flex items-center justify-center text-white text-3xl font-bold shadow-lg overflow-hidden"
                             >
                                 {contact.photoUrl ? (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
                                     <img src={contact.photoUrl} alt={contact.displayName} className="w-full h-full object-cover" />
                                 ) : (
                                     getInitials(contact.displayName || `${contact.givenName} ${contact.familyName}`)
@@ -195,7 +187,7 @@ export default function ContactDetailsPage() {
                                     ) : !reminders || reminders.length === 0 ? (
                                         <p className="text-sm text-muted-foreground">No active reminders.</p>
                                     ) : (
-                                        reminders.map((reminder: any) => (
+                                        reminders.map((reminder: { id: string; title?: string; message: string; scheduledFor?: string; createdAt: string }) => (
                                             <div key={reminder.id} className="p-3 bg-muted/30 rounded-lg flex gap-3 group">
                                                 <div className="mt-1">
                                                     <Clock className="w-4 h-4 text-primary" />

@@ -30,7 +30,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuCheckboxItem
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 interface InteractionsTableProps {
     interactions: any[];

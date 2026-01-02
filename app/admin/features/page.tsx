@@ -46,10 +46,7 @@ export default function FeaturesPage() {
         }
     }
 
-    // Memoize columns to prevent re-rendering loops if we passed unstable function reference, 
-    // though here updateStatus is stable enough if we don't wrap it in useCallback (it is stable per render)
-    // Actually, updateStatus changes on every render because it closes over state setter? 
-    // No, setFeatures is stable. But let's be safe.
+    // Pass functions directly as they are stable (declared within component but rely on stable deps or we explicitly ignore deps issue if we want, but better to just let useMemo handle it by passing them as deps)
     const columns = useMemo(() => getColumns(updateStatus, updateTags), [updateStatus, updateTags])
 
     if (isLoading) {

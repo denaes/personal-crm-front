@@ -5,19 +5,6 @@ import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-col
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal } from "lucide-react"
-import { api } from "@/lib/api-config"
-import { useState } from "react"
-
-// Wait, I should use a proper Select for status editing inline? Or a Dialog?
-// Let's use a Cell component to handle state.
-
-import {
     Select,
     SelectContent,
     SelectItem,
@@ -33,6 +20,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Plus, X } from "lucide-react"
+import { useState } from "react"
 
 export type FeatureRequest = {
     id: string
@@ -48,7 +36,7 @@ export type FeatureRequest = {
     createdAt: string
 }
 
-const TagsCell = ({ row, updateTags }: { row: any, updateTags: (id: string, tags: string[]) => Promise<void> }) => {
+const TagsCell = ({ row, updateTags }: { row: { getValue: (key: string) => any; original: FeatureRequest }, updateTags: (id: string, tags: string[]) => Promise<void> }) => {
     const tags = (row.getValue("tags") || []) as string[]
     const [isUpdating, setIsUpdating] = useState(false)
     const [newTag, setNewTag] = useState("")
@@ -118,7 +106,7 @@ const TagsCell = ({ row, updateTags }: { row: any, updateTags: (id: string, tags
     )
 }
 
-const StatusCell = ({ row, updateStatus }: { row: any, updateStatus: (id: string, status: string) => Promise<void> }) => {
+const StatusCell = ({ row, updateStatus }: { row: { getValue: (key: string) => any; original: FeatureRequest }, updateStatus: (id: string, status: string) => Promise<void> }) => {
     const status = row.getValue("status") as string
     const [isUpdating, setIsUpdating] = useState(false)
 

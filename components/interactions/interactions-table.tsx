@@ -6,7 +6,6 @@ import {
     MessageSquare,
     Phone,
     Mail,
-    Users,
     Gift,
     Calendar,
     Pencil,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Plus, Tag, Loader2 } from "lucide-react";
 import { useCreateFeatureRequest } from "@/lib/hooks/use-feature-requests";
 
@@ -53,10 +53,20 @@ export function SubmitFeatureModal({ isOpen, onClose }: SubmitFeatureModalProps)
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+        >
             <div className="bg-background border border-border rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit} onKeyDown={(e) => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        onClose();
+                    } else if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                         e.preventDefault();
                         handleSubmit(e);
                     }

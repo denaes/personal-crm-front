@@ -4,7 +4,7 @@ import { useCurrentUser } from "@/lib/hooks/use-auth";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Users, Lightbulb, ArrowLeft } from "lucide-react";
+import { Users, Lightbulb, ArrowLeft, ScrollText } from "lucide-react";
 
 export default function AdminLayout({
     children,
@@ -24,18 +24,6 @@ export default function AdminLayout({
     }, [user, isLoading, router]);
 
 
-    if (isLoading) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-        );
-    }
-
-    if (!user || user.role !== 'admin') {
-        return null; // Will redirect in useEffect
-    }
-
     const navItems = [
         {
             name: "Users",
@@ -47,7 +35,32 @@ export default function AdminLayout({
             href: "/admin/features",
             icon: Lightbulb,
         },
+        {
+            name: "Audit Logs",
+            href: "/admin/audit-logs",
+            icon: ScrollText,
+        },
     ];
+
+    // Always render layout to maintain consistent hook order in children
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen bg-background">
+                <aside className="w-64 border-r border-border bg-card hidden md:flex md:flex-col">
+                    <div className="h-16 flex items-center px-6 border-b border-border">
+                        <span className="font-display font-bold text-lg">Super Admin</span>
+                    </div>
+                </aside>
+                <main className="flex-1 overflow-y-auto flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </main>
+            </div>
+        );
+    }
+
+    if (!user || user.role !== 'admin') {
+        return null; // Will redirect in useEffect
+    }
 
     return (
         <div className="flex min-h-screen bg-background">

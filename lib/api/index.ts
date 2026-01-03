@@ -8,6 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { ApiResponseDto } from './models/ApiResponseDto';
+export type { AuditLogResponseDto } from './models/AuditLogResponseDto';
 export type { CommandRequestDto } from './models/CommandRequestDto';
 export { ContactDto } from './models/ContactDto';
 export type { ContactResponseDto } from './models/ContactResponseDto';
@@ -26,6 +27,8 @@ export { UpdateFeatureRequestDto } from './models/UpdateFeatureRequestDto';
 export { UpdateInteractionDto } from './models/UpdateInteractionDto';
 export { UpdateReminderDto } from './models/UpdateReminderDto';
 export { UpdateUserRoleDto } from './models/UpdateUserRoleDto';
+export type { WrappedAuditLogListResponseDto } from './models/WrappedAuditLogListResponseDto';
+export type { WrappedAuditLogResponseDto } from './models/WrappedAuditLogResponseDto';
 export type { WrappedContactListResponseDto } from './models/WrappedContactListResponseDto';
 export type { WrappedFeatureRequestListResponseDto } from './models/WrappedFeatureRequestListResponseDto';
 export type { WrappedFeatureRequestResponseDto } from './models/WrappedFeatureRequestResponseDto';
@@ -35,6 +38,7 @@ export type { WrappedReminderListResponseDto } from './models/WrappedReminderLis
 export type { WrappedReminderResponseDto } from './models/WrappedReminderResponseDto';
 
 export { AiCommandService } from './services/AiCommandService';
+export { AuditLogsService } from './services/AuditLogsService';
 export { AuthService } from './services/AuthService';
 export { ContactsService } from './services/ContactsService';
 export { FeatureRequestsService } from './services/FeatureRequestsService';

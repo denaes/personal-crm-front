@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback } from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { getColumns } from "./columns"
 import { useFeatureRequests, useUpdateFeatureRequest } from "@/lib/hooks/use-feature-requests"
+import { KanbanBoard } from "@/components/features/kanban-board"
+import { Button } from "@/components/ui/button"
 import {
     Lightbulb,
     Clock,
@@ -11,10 +13,13 @@ import {
     Pause,
     XCircle,
     Loader2,
-    AlertCircle
+    AlertCircle,
+    LayoutGrid,
+    List,
 } from "lucide-react"
 
 export default function FeaturesPage() {
+    const [viewMode, setViewMode] = useState<"table" | "board">("table")
     const [selectedStatus, setSelectedStatus] = useState("all")
     const { data: features = [], isLoading, error } = useFeatureRequests(
         selectedStatus === "all" ? undefined : selectedStatus,
@@ -54,6 +59,7 @@ export default function FeaturesPage() {
         }
     }, [updateFeatureMutation])
 
+    // Always call getColumns to maintain consistent hook order
     const columns = useMemo(() => getColumns(updateStatus, updateTags), [updateStatus, updateTags])
 
     if (isLoading) {
@@ -69,7 +75,7 @@ export default function FeaturesPage() {
         return (
             <div className="flex flex-col items-center justify-center h-full text-destructive">
                 <AlertCircle className="w-8 h-8 mb-4" />
-                <p>Failed to load features</p>
+                <p>Failed to load features.</p>
             </div>
         )
     }
@@ -82,6 +88,26 @@ export default function FeaturesPage() {
                     <p className="text-muted-foreground">
                         Manage feature requests and update statuses.
                     </p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant={viewMode === "table" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setViewMode("table")}
+                        className="gap-2"
+                    >
+                        <List className="w-4 h-4" />
+                        Table
+                    </Button>
+                    <Button
+                        variant={viewMode === "board" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setViewMode("board")}
+                        className="gap-2"
+                    >
+                        <LayoutGrid className="w-4 h-4" />
+                        Board
+                    </Button>
                 </div>
             </div>
 
@@ -105,7 +131,20 @@ export default function FeaturesPage() {
                 })}
             </div>
 
-            <DataTable data={features} columns={columns} filterColumn="title" filterPlaceholder="Filter titles..." />
+            <div className={viewMode === "table" ? "block" : "hidden"}>
+                <DataTable
+                    data={features}
+                    columns={columns}
+                    filterColumn="title"
+                    filterPlaceholder="Filter titles..."
+                />
+            </div>
+            <div className={viewMode === "board" ? "block" : "hidden"}>
+                <KanbanBoard
+                    features={features}
+                    updateStatus={updateStatus}
+                />
+            </div>
         </div>
     )
 }

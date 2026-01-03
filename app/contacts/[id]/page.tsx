@@ -16,7 +16,7 @@ import {
     Clock,
     ArrowLeft,
     Trash,
-    MessageSquare,
+    StickyNote,
 } from "lucide-react";
 import { FavoriteStar } from "@/components/ui/favorite-star";
 import Link from "next/link";
@@ -298,7 +298,7 @@ function InlineInteractionForm({ contactId }: { contactId: string }) {
     });
 
     const types = [
-        { id: 'note', label: 'Note', icon: MessageSquare },
+        { id: 'note', label: 'Note', icon: StickyNote },
         { id: 'call', label: 'Call', icon: Phone },
         { id: 'email', label: 'Email', icon: Mail },
         { id: 'meeting', label: 'Meeting', icon: Calendar },

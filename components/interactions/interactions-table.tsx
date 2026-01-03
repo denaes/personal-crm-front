@@ -43,7 +43,7 @@ const getTypeIcon = (type: string) => {
     switch (type) {
         case 'call': return <Phone className="w-4 h-4 text-blue-500" />;
         case 'email': return <Mail className="w-4 h-4 text-green-500" />;
-        case 'meeting': return <Users className="w-4 h-4 text-purple-500" />;
+        case 'meeting': return <Calendar className="w-4 h-4 text-purple-500" />;
         case 'note': return <StickyNote className="w-4 h-4 text-yellow-500" />;
         case 'gift': return <Gift className="w-4 h-4 text-pink-500" />;
         case 'event': return <Calendar className="w-4 h-4 text-orange-500" />;
@@ -188,7 +188,7 @@ export function InteractionsTable({ interactions, onDelete, onEdit, showContactC
                 </div>
             </div>
 
-            <div className="rounded-md border bg-card">
+            <div className="rounded-md border bg-card overflow-x-auto">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-muted/50 text-muted-foreground font-medium border-b">
                         <tr>
@@ -269,7 +269,7 @@ export function InteractionsTable({ interactions, onDelete, onEdit, showContactC
                                         </td>
                                     )}
                                     <td className="p-4 max-w-[400px]">
-                                        <p className="truncate text-muted-foreground" title={interaction.content || interaction.notes}>
+                                        <p className="whitespace-pre-wrap break-words text-muted-foreground" title={interaction.content || interaction.notes}>
                                             {interaction.content || interaction.notes || "No content"}
                                         </p>
                                     </td>

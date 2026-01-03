@@ -21,19 +21,16 @@ import {
 } from "@/components/ui/popover"
 import { Plus, X } from "lucide-react"
 import { useState } from "react"
+import type { FeatureRequest } from "@/lib/hooks/use-feature-requests"
 
-export type FeatureRequest = {
-    id: string
-    title: string
-    description: string
-    status: string
-    upvotes: number
-    tags: string[]
-    creator: {
-        email: string
-        displayName: string
-    }
-    createdAt: string
+const statusColors: Record<string, string> = {
+    proposed: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    "under-review": "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
+    planned: "bg-green-500/10 text-green-600 border-green-500/20",
+    "in-progress": "bg-purple-500/10 text-purple-500 border-purple-500/20",
+    completed: "bg-green-600/10 text-green-700 border-green-600/20",
+    postponed: "bg-gray-500/10 text-gray-600 border-gray-500/20",
+    rejected: "bg-red-500/10 text-red-500 border-red-500/20",
 }
 
 const TagsCell = ({ row, updateTags }: { row: { getValue: (key: string) => unknown; original: FeatureRequest }, updateTags: (id: string, tags: string[]) => Promise<void> }) => {
@@ -120,23 +117,30 @@ const StatusCell = ({ row, updateStatus }: { row: { getValue: (key: string) => u
         }
     }
 
+    const badgeClass = `px-2 py-0.5 rounded-full text-xs font-medium border ${statusColors[status] || "bg-gray-100 text-gray-800 border-gray-200"}`
+
     return (
         <Select defaultValue={status} onValueChange={onValueChange} disabled={isUpdating}>
-            <SelectTrigger className="w-[130px] h-8">
-                <SelectValue placeholder="Status" />
+            <SelectTrigger className="w-[140px] h-8 p-0 border-none shadow-none bg-transparent hover:bg-muted/50 focus:ring-0">
+                <SelectValue placeholder="Status">
+                    <span className={badgeClass}>
+                        {status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                    </span>
+                </SelectValue>
             </SelectTrigger>
             <SelectContent>
-                <SelectItem value="proposed">Proposed</SelectItem>
-                <SelectItem value="under-review">Under Review</SelectItem>
-                <SelectItem value="planned">Planned</SelectItem>
-                <SelectItem value="in-progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="postponed">Postponed</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
+                <SelectItem value="proposed"><span className={statusColors.proposed}>Proposed</span></SelectItem>
+                <SelectItem value="under-review"><span className={statusColors["under-review"]}>Under Review</span></SelectItem>
+                <SelectItem value="planned"><span className={statusColors.planned}>Planned</span></SelectItem>
+                <SelectItem value="in-progress"><span className={statusColors["in-progress"]}>In Progress</span></SelectItem>
+                <SelectItem value="completed"><span className={statusColors.completed}>Completed</span></SelectItem>
+                <SelectItem value="postponed"><span className={statusColors.postponed}>Postponed</span></SelectItem>
+                <SelectItem value="rejected"><span className={statusColors.rejected}>Rejected</span></SelectItem>
             </SelectContent>
         </Select>
     )
 }
+
 
 export const getColumns = (
     updateStatus: (id: string, status: string) => Promise<void>,

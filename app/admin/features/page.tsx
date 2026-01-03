@@ -1,56 +1,77 @@
 "use client"
 
-import { useEffect, useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
-import { getColumns, FeatureRequest } from "./columns" // Import getColumns factory
-import { api } from "@/lib/api-config"
+import { getColumns } from "./columns"
+import { useFeatureRequests, useUpdateFeatureRequest } from "@/lib/hooks/use-feature-requests"
+import {
+    Lightbulb,
+    Clock,
+    CheckCircle2,
+    Pause,
+    XCircle,
+    Loader2,
+    AlertCircle
+} from "lucide-react"
 
 export default function FeaturesPage() {
-    const [features, setFeatures] = useState<FeatureRequest[]>([])
-    const [isLoading, setIsLoading] = useState(true)
+    const [selectedStatus, setSelectedStatus] = useState("all")
+    const { data: features = [], isLoading, error } = useFeatureRequests(
+        selectedStatus === "all" ? undefined : selectedStatus,
+        undefined,
+        "newest",
+        "DESC"
+    )
+    const updateFeatureMutation = useUpdateFeatureRequest()
 
-    const fetchFeatures = async () => {
-        try {
-            // Fetch all features, sorting by newest usually good for admin
-            const response = await api.get('/api/v1/feature-requests?sortBy=newest&status=all')
-            setFeatures(response.data.data || response.data)
-        } catch (error) {
-            console.error("Failed to fetch features:", error)
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        fetchFeatures()
-    }, [])
+    const statuses = [
+        { id: "all", label: "All", icon: Lightbulb },
+        { id: "proposed", label: "Proposed", icon: Lightbulb },
+        { id: "under-review", label: "Under Review", icon: Clock },
+        { id: "planned", label: "Planned", icon: CheckCircle2 },
+        { id: "in-progress", label: "In Progress", icon: Clock },
+        { id: "completed", label: "Completed", icon: CheckCircle2 },
+        { id: "postponed", label: "Postponed", icon: Pause },
+        { id: "rejected", label: "Rejected", icon: XCircle },
+    ];
 
     const updateStatus = useCallback(async (id: string, status: string) => {
         try {
-            await api.put(`/api/v1/feature-requests/${id}`, { status })
-            // Optimistic update or refetch
-            setFeatures(prev => prev.map(f => f.id === id ? { ...f, status } : f))
+            // @ts-expect-error - status type mismatch between string and literal type in generated DTO
+            await updateFeatureMutation.mutateAsync({ id, data: { status } })
         } catch (error) {
             console.error("Failed to update status:", error)
             alert("Failed to update status")
         }
-    }, [])
+    }, [updateFeatureMutation])
 
     const updateTags = useCallback(async (id: string, tags: string[]) => {
         try {
-            await api.put(`/api/v1/feature-requests/${id}`, { tags })
-            setFeatures(prev => prev.map(f => f.id === id ? { ...f, tags } : f))
+            await updateFeatureMutation.mutateAsync({ id, data: { tags } })
         } catch (error) {
             console.error("Failed to update tags:", error)
             alert("Failed to update tags")
         }
-    }, [])
+    }, [updateFeatureMutation])
 
-    // Pass functions directly as they are stable (declared within component but rely on stable deps or we explicitly ignore deps issue if we want, but better to just let useMemo handle it by passing them as deps)
     const columns = useMemo(() => getColumns(updateStatus, updateTags), [updateStatus, updateTags])
 
     if (isLoading) {
-        return <div>Loading features...</div>
+        return (
+            <div className="flex flex-col items-center justify-center h-full">
+                <Loader2 className="w-8 h-8 text-primary animate-spin mb-4" />
+                <p className="text-muted-foreground">Loading features...</p>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-destructive">
+                <AlertCircle className="w-8 h-8 mb-4" />
+                <p>Failed to load features</p>
+            </div>
+        )
     }
 
     return (
@@ -63,6 +84,27 @@ export default function FeaturesPage() {
                     </p>
                 </div>
             </div>
+
+            {/* Status Filters */}
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {statuses.map((status) => {
+                    const Icon = status.icon;
+                    return (
+                        <button
+                            key={status.id}
+                            onClick={() => setSelectedStatus(status.id)}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-all border ${selectedStatus === status.id
+                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                : "bg-background hover:bg-muted border-border text-muted-foreground"
+                                }`}
+                        >
+                            <Icon className="w-3.5 h-3.5" />
+                            {status.label}
+                        </button>
+                    );
+                })}
+            </div>
+
             <DataTable data={features} columns={columns} filterColumn="title" filterPlaceholder="Filter titles..." />
         </div>
     )

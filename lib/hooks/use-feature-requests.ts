@@ -4,8 +4,14 @@ import { FeatureRequestsService, CreateFeatureRequestDto, UpdateFeatureRequestDt
 export interface FeatureRequest extends CreateFeatureRequestDto {
     id: string;
     status: string;
-    votes: number;
-    userId: string;
+    upvotes: number;
+    hasUserVoted: boolean;
+    creator: {
+        id: string;
+        email: string;
+        displayName: string;
+    };
+    completedAt: string | null;
     createdAt: string;
     updatedAt: string;
 }

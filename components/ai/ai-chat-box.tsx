@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Loader2, X, Bot, User } from "lucide-react";
 import { useAiCommand, type CommandResponse } from "@/lib/hooks/use-ai-command";
 import { ContactMentionPicker } from "./contact-mention-picker";
+import { Contact } from "@/lib/hooks/use-contacts";
 
 interface Message {
     id: string;
@@ -12,15 +13,6 @@ interface Message {
     content: string;
     timestamp: Date;
     toolsUsed?: string[];
-}
-
-interface Contact {
-    id: string;
-    displayName: string;
-    emailAddresses: string[];
-    photoUrl?: string;
-    givenName: string;
-    familyName?: string;
 }
 
 interface MentionData {
@@ -116,7 +108,8 @@ export function AiChatBox() {
 
     // Handle contact selection from mention picker
     const handleContactSelect = (contact: Contact) => {
-        const mentionText = `@${contact.displayName}`;
+        const displayName = contact.displayName || `${contact.givenName} ${contact.familyName || ''}`.trim();
+        const mentionText = `@${displayName}`;
 
         // Replace "@query" with the full mention
         const beforeMention = input.slice(0, mentionStartPos);

@@ -20,29 +20,12 @@ import {
     useFeatureRequests,
     useVoteFeatureRequest,
     useUnvoteFeatureRequest,
+    FeatureRequest,
 } from "@/lib/hooks/use-feature-requests";
-
-interface FeatureRequestResponseDto {
-    id: string;
-    title: string;
-    description: string;
-    status: string;
-    tags: string[];
-    upvotes: number;
-    hasUserVoted: boolean;
-    creator: {
-        id: string;
-        email: string;
-        displayName: string;
-    };
-    completedAt: Date | null;
-    createdAt: Date;
-    updatedAt: Date;
-}
 
 export default function FeaturesPage() {
     const [selectedStatus, setSelectedStatus] = useState("all");
-    const [sortBy, setSortBy] = useState("votes");
+    const [sortBy, setSortBy] = useState<"votes" | "newest" | "updated">("votes");
     const [showSubmitModal, setShowSubmitModal] = useState(false);
 
     const { data: features, isLoading, error } = useFeatureRequests(
@@ -162,7 +145,7 @@ export default function FeaturesPage() {
                         <div className="flex gap-2">
                             <select
                                 value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
+                                onChange={(e) => setSortBy(e.target.value as "votes" | "newest" | "updated")}
                                 className="px-4 py-2 bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                             >
                                 <option value="votes">Most Voted</option>
@@ -220,7 +203,7 @@ export default function FeaturesPage() {
                         <div className="space-y-4">
                             <AnimatePresence>
                                 {features && features.length > 0 ? (
-                                    features.map((feature: FeatureRequestResponseDto) => {
+                                    features.map((feature: FeatureRequest) => {
                                         const statusConfig = getStatusIcon(
                                             feature.status
                                         );

@@ -54,7 +54,7 @@ export const columns: ColumnDef<AuditLogResponseDto>[] = [
             <DataTableColumnHeader column={column} title="Metadata" />
         ),
         cell: ({ row }) => {
-            const metadata = row.getValue("metadata") as Record<string, any>
+            const metadata = row.getValue("metadata") as Record<string, unknown>
             if (!metadata) return <span className="text-muted-foreground">-</span>
             return (
                 <pre className="text-[10px] text-muted-foreground max-w-[200px] overflow-hidden whitespace-pre-wrap">

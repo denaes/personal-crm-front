@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState, useMemo } from "react"
-import { DataTable } from "@/components/ui/data-table/data-table"
 import { DataTableToolbar } from "@/components/ui/data-table/data-table-toolbar"
 import { columns } from "./columns" // Import columns definition
 import { AuditLogResponseDto, AuditLogsService } from "@/lib/api"

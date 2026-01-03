@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Plus, Tag, Loader2 } from "lucide-react";
 import { useCreateFeatureRequest } from "@/lib/hooks/use-feature-requests";
 

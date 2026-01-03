@@ -40,7 +40,13 @@ type FeatureStatus =
     | "postponed"
     | "rejected"
 
-const statusConfig: Record<FeatureStatus, { label: string; icon: any; color: string }> = {
+type StatusConfig = {
+    label: string
+    icon: React.ComponentType<{ className?: string }>
+    color: string
+}
+
+const statusConfig: Record<FeatureStatus, StatusConfig> = {
     proposed: {
         label: "Proposed",
         icon: Lightbulb,

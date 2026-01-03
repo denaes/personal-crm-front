@@ -11,16 +11,6 @@ interface KanbanCardProps {
     feature: FeatureRequest
 }
 
-const statusColors: Record<string, string> = {
-    proposed: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-    "under-review": "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
-    planned: "bg-green-500/10 text-green-600 border-green-500/20",
-    "in-progress": "bg-purple-500/10 text-purple-500 border-purple-500/20",
-    completed: "bg-green-600/10 text-green-700 border-green-600/20",
-    postponed: "bg-gray-500/10 text-gray-600 border-gray-500/20",
-    rejected: "bg-red-500/10 text-red-500 border-red-500/20",
-}
-
 export function KanbanCard({ feature }: KanbanCardProps) {
     const {
         attributes,

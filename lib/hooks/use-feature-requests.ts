@@ -4,7 +4,7 @@ import { FeatureRequestsService, CreateFeatureRequestDto, UpdateFeatureRequestDt
 export function useFeatureRequests(
     status?: string,
     tags?: string,
-    sortBy: string = 'votes',
+    sortBy: 'votes' | 'newest' | 'updated' = 'votes',
     sortOrder: 'ASC' | 'DESC' = 'DESC'
 ) {
     return useQuery({
@@ -13,11 +13,10 @@ export function useFeatureRequests(
             const response = await FeatureRequestsService.featureRequestsControllerFindAll(
                 status,
                 tags,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                sortBy as any,
+                sortBy,
                 sortOrder
             );
-            return response.data;
+            return (response as any).data;
         },
     });
 }
@@ -27,7 +26,7 @@ export function useFeatureRequest(id: string) {
         queryKey: ["feature-request", id],
         queryFn: async () => {
             const response = await FeatureRequestsService.featureRequestsControllerFindOne(id);
-            return response.data;
+            return (response as any).data;
         },
         enabled: !!id,
     });
@@ -39,7 +38,7 @@ export function useCreateFeatureRequest() {
     return useMutation({
         mutationFn: async (data: CreateFeatureRequestDto) => {
             const response = await FeatureRequestsService.featureRequestsControllerCreate(data);
-            return response.data;
+            return (response as any).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });
@@ -53,7 +52,7 @@ export function useUpdateFeatureRequest() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateFeatureRequestDto }) => {
             const response = await FeatureRequestsService.featureRequestsControllerUpdate(id, data);
-            return response.data;
+            return (response as any).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });
@@ -79,7 +78,7 @@ export function useVoteFeatureRequest() {
     return useMutation({
         mutationFn: async (featureId: string) => {
             const response = await FeatureRequestsService.featureRequestsControllerVote(featureId);
-            return response.data;
+            return (response as any).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });
@@ -93,7 +92,7 @@ export function useUnvoteFeatureRequest() {
     return useMutation({
         mutationFn: async (featureId: string) => {
             const response = await FeatureRequestsService.featureRequestsControllerUnvote(featureId);
-            return response.data;
+            return (response as any).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });

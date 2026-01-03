@@ -22,20 +22,24 @@ export function useContacts(options?: {
         queryKey: ['contacts', options],
         queryFn: async () => {
             if (isSearch) {
-                console.log('[useContacts] Searching for:', options!.search!);
                 const response = await ContactsService.contactsControllerSearch(options!.search!);
-                console.log('[useContacts] Search response:', response);
-                console.log('[useContacts] Search response.data:', response.data);
-                // Search returns data directly as ContactDto[]
-                // Wrap it in the same structure as findAll for consistency
-                const result = {
-                    data: response.data,
-                    total: response.data.length,
+                // Search returns data directly as ContactDto[], wrap it for consistency if needed or handle in UI
+                // The backend search endpoint returns ContactDto[] directly, not nested in data/meta
+                // But findAll returns { data: ContactDto[], total: number ... }
+                // To keep hook compatible with UI expecting { data: ... } we might need to wrap it specifically
+
+                // The search endpoint is also intercepted by TransformInterceptor!
+                // So response is { data: ContactDto[] }
+                // response.data is ContactDto[]
+
+                const contacts = (response as any).data;
+
+                return {
+                    data: contacts, // The component expects .data to be the array of contacts when it also has total/page
+                    total: contacts.length,
                     page: 1,
-                    limit: response.data.length
+                    limit: contacts.length
                 };
-                console.log('[useContacts] Returning wrapped result:', result);
-                return result;
             }
 
             const response = await ContactsService.contactsControllerFindAll(
@@ -46,7 +50,7 @@ export function useContacts(options?: {
                 options?.sortBy,
                 options?.sortOrder
             );
-            return response.data;
+            return (response as any).data; // This is { data: ContactDto[], total: number }
         },
     });
 }
@@ -59,7 +63,7 @@ export function useContact(id: string) {
         queryKey: ["contact", id],
         queryFn: async () => {
             const result = await ContactsService.contactsControllerFindOne(id);
-            return result.data;
+            return (result as any).data;
         },
         enabled: !!id,
     });
@@ -74,7 +78,7 @@ export function useCreateContact() {
     return useMutation({
         mutationFn: async (data: CreateContactDto) => {
             const result = await ContactsService.contactsControllerCreate(data);
-            return result.data;
+            return (result as any).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["contacts"] });
@@ -91,7 +95,7 @@ export function useUpdateContact() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateContactDto }) => {
             const result = await ContactsService.contactsControllerUpdate(id, data);
-            return result.data;
+            return (result as any).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["contacts"] });

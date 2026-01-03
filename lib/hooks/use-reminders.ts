@@ -11,8 +11,7 @@ export function useReminders(active?: boolean) {
         queryKey: ["reminders", active],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindAll(active);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
     });
 }
@@ -25,8 +24,7 @@ export function useDueReminders() {
         queryKey: ["reminders", "due"],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindDue();
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
     });
 }
@@ -39,8 +37,7 @@ export function useRemindersByContact(contactId: string) {
         queryKey: ["reminders", "contact", contactId],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindByContact(contactId);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         enabled: !!contactId,
     });
@@ -54,8 +51,7 @@ export function useReminder(id: string) {
         queryKey: ["reminder", id],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindOne(id);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         enabled: !!id,
     });
@@ -70,8 +66,7 @@ export function useCreateReminder() {
     return useMutation({
         mutationFn: async (data: CreateReminderDto) => {
             const result = await RemindersService.remindersControllerCreate(data);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });
@@ -88,8 +83,7 @@ export function useUpdateReminder() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateReminderDto }) => {
             const result = await RemindersService.remindersControllerUpdate(id, data);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });
@@ -121,8 +115,7 @@ export function useSnoozeReminder() {
     return useMutation({
         mutationFn: async ({ id, hours }: { id: string; hours?: number }) => {
             const result = await RemindersService.remindersControllerSnooze(id, hours);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });

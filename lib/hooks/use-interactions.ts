@@ -11,8 +11,7 @@ export function useInteractions() {
         queryKey: ["interactions"],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindAll();
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
     });
 }
@@ -25,8 +24,7 @@ export function useInteractionsByContact(contactId: string) {
         queryKey: ["interactions", "contact", contactId],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindByContact(contactId);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         enabled: !!contactId,
     });
@@ -40,8 +38,7 @@ export function useInteraction(id: string) {
         queryKey: ["interaction", id],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindOne(id);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         enabled: !!id,
     });
@@ -56,8 +53,7 @@ export function useCreateInteraction() {
     return useMutation({
         mutationFn: async (data: CreateInteractionDto) => {
             const result = await InteractionsService.interactionsControllerCreate(data);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["interactions"] });
@@ -74,8 +70,7 @@ export function useUpdateInteraction() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateInteractionDto }) => {
             const result = await InteractionsService.interactionsControllerUpdate(id, data);
-            // @ts-expect-error: API response type mismatch
-            return result.data || result;
+            return (result as any).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["interactions"] });

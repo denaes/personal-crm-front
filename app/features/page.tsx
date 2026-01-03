@@ -249,7 +249,7 @@ export default function FeaturesPage() {
                                                                 unvoteMutation.isPending
                                                             }
                                                             className={`flex flex-col items-center justify-center w-16 h-16 rounded-lg transition-all disabled:opacity-50 ${feature.hasUserVoted
-                                                                ? "bg-primary text-white"
+                                                                ? "bg-gradient-primary text-white shadow-md"
                                                                 : "bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary"
                                                                 }`}
                                                         >

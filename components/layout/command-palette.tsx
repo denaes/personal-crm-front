@@ -7,9 +7,10 @@ import {
     DialogContent,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Search, Users, MessageSquare, Bell, Hash, ArrowRight } from "lucide-react";
+import { Search, Users, MessageSquare, Bell, Hash, ArrowRight, Lightbulb, Shield } from "lucide-react";
 import { cn, getInitials } from "@/lib/utils";
 import { useContacts } from "@/lib/hooks/use-contacts";
+import { useAuthStore } from "@/lib/stores/auth-store";
 
 interface CommandPaletteProps {
     open: boolean;
@@ -28,6 +29,7 @@ interface Command {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     const router = useRouter();
+    const { user } = useAuthStore();
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -86,6 +88,20 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 category: "navigation",
                 action: () => router.push("/reminders"),
             },
+            {
+                id: "nav-features",
+                title: "Go to Features",
+                icon: Lightbulb,
+                category: "navigation",
+                action: () => router.push("/features"),
+            },
+            ...(user?.role === 'admin' ? [{
+                id: "nav-admin",
+                title: "Go to Super Admin",
+                icon: Shield,
+                category: "navigation",
+                action: () => router.push("/admin"),
+            } as Command] : []),
             // Quick Actions
             {
                 id: "action-add-contact",
@@ -126,7 +142,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 action: () => router.push("/contacts?tag=work"),
             },
         ],
-        [router]
+        [router, user]
     );
 
     // Combine commands

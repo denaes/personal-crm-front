@@ -18,6 +18,7 @@ export { UpdateContactDto } from './models/UpdateContactDto';
 export { UpdateFeatureRequestDto } from './models/UpdateFeatureRequestDto';
 export { UpdateInteractionDto } from './models/UpdateInteractionDto';
 export { UpdateReminderDto } from './models/UpdateReminderDto';
+export { UpdateUserRoleDto } from './models/UpdateUserRoleDto';
 
 export { AiCommandService } from './services/AiCommandService';
 export { AuthService } from './services/AuthService';

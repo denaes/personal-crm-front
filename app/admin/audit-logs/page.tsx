@@ -54,9 +54,9 @@ export default function AuditLogsPage() {
 
     // Get unique values for filters
     const filterOptions = useMemo(() => {
-        const actors = Array.from(new Set(data.map(log => log.actor).filter(Boolean)))
-        const actions = Array.from(new Set(data.map(log => log.action).filter(Boolean)))
-        const entityTypes = Array.from(new Set(data.map(log => log.entityType).filter(Boolean)))
+        const actors = Array.from(new Set(data.map(log => log.actor).filter(Boolean))) as string[]
+        const actions = Array.from(new Set(data.map(log => log.action).filter(Boolean))) as string[]
+        const entityTypes = Array.from(new Set(data.map(log => log.entityType).filter(Boolean))) as string[]
 
         return {
             actor: actors.map(value => ({ label: value, value })),

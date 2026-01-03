@@ -1,13 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FeatureRequestsService, CreateFeatureRequestDto, UpdateFeatureRequestDto } from "../api";
 
+export interface FeatureRequest extends CreateFeatureRequestDto {
+    id: string;
+    status: string;
+    votes: number;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export function useFeatureRequests(
     status?: string,
     tags?: string,
     sortBy: 'votes' | 'newest' | 'updated' = 'votes',
     sortOrder: 'ASC' | 'DESC' = 'DESC'
 ) {
-    return useQuery({
+    return useQuery<FeatureRequest[]>({
         queryKey: ["feature-requests", status, tags, sortBy, sortOrder],
         queryFn: async () => {
             const response = await FeatureRequestsService.featureRequestsControllerFindAll(
@@ -16,17 +25,17 @@ export function useFeatureRequests(
                 sortBy,
                 sortOrder
             );
-            return (response as any).data;
+            return (response as unknown as { data: FeatureRequest[] }).data;
         },
     });
 }
 
 export function useFeatureRequest(id: string) {
-    return useQuery({
+    return useQuery<FeatureRequest>({
         queryKey: ["feature-request", id],
         queryFn: async () => {
             const response = await FeatureRequestsService.featureRequestsControllerFindOne(id);
-            return (response as any).data;
+            return (response as unknown as { data: FeatureRequest }).data;
         },
         enabled: !!id,
     });
@@ -38,7 +47,7 @@ export function useCreateFeatureRequest() {
     return useMutation({
         mutationFn: async (data: CreateFeatureRequestDto) => {
             const response = await FeatureRequestsService.featureRequestsControllerCreate(data);
-            return (response as any).data;
+            return (response as unknown as { data: FeatureRequest }).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });
@@ -52,7 +61,7 @@ export function useUpdateFeatureRequest() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateFeatureRequestDto }) => {
             const response = await FeatureRequestsService.featureRequestsControllerUpdate(id, data);
-            return (response as any).data;
+            return (response as unknown as { data: FeatureRequest }).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });
@@ -78,7 +87,7 @@ export function useVoteFeatureRequest() {
     return useMutation({
         mutationFn: async (featureId: string) => {
             const response = await FeatureRequestsService.featureRequestsControllerVote(featureId);
-            return (response as any).data;
+            return (response as unknown as { data: FeatureRequest }).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });
@@ -92,7 +101,7 @@ export function useUnvoteFeatureRequest() {
     return useMutation({
         mutationFn: async (featureId: string) => {
             const response = await FeatureRequestsService.featureRequestsControllerUnvote(featureId);
-            return (response as any).data;
+            return (response as unknown as { data: FeatureRequest }).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["feature-requests"] });

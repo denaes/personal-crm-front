@@ -3,6 +3,23 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ContactsService, CreateContactDto, UpdateContactDto } from "@/lib/api";
 
+export interface Contact extends CreateContactDto {
+    id: string;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+    lastContactedAt?: string | null;
+    displayName?: string;
+    photoUrl?: string; // Also adding photoUrl as it is used
+}
+
+interface ContactsResponse {
+    data: Contact[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
 /**
  * Hook to fetch all contacts
  */
@@ -18,7 +35,7 @@ export function useContacts(options?: {
     // Determine if we are searching or listing
     const isSearch = !!options?.search;
 
-    return useQuery({
+    return useQuery<ContactsResponse>({
         queryKey: ['contacts', options],
         queryFn: async () => {
             if (isSearch) {
@@ -32,7 +49,7 @@ export function useContacts(options?: {
                 // So response is { data: ContactDto[] }
                 // response.data is ContactDto[]
 
-                const contacts = (response as any).data;
+                const contacts = (response as unknown as { data: Contact[] }).data;
 
                 return {
                     data: contacts, // The component expects .data to be the array of contacts when it also has total/page
@@ -50,7 +67,10 @@ export function useContacts(options?: {
                 options?.sortBy,
                 options?.sortOrder
             );
-            return (response as any).data; // This is { data: ContactDto[], total: number }
+
+            // Unwrap response data just like in search
+            // The global TransformInterceptor wraps everything in { data: ... }
+            return (response as unknown as { data: ContactsResponse }).data;
         },
     });
 }
@@ -59,11 +79,11 @@ export function useContacts(options?: {
  * Hook to fetch a single contact by ID
  */
 export function useContact(id: string) {
-    return useQuery({
+    return useQuery<Contact>({
         queryKey: ["contact", id],
         queryFn: async () => {
             const result = await ContactsService.contactsControllerFindOne(id);
-            return (result as any).data;
+            return (result as unknown as { data: Contact }).data;
         },
         enabled: !!id,
     });
@@ -78,7 +98,7 @@ export function useCreateContact() {
     return useMutation({
         mutationFn: async (data: CreateContactDto) => {
             const result = await ContactsService.contactsControllerCreate(data);
-            return (result as any).data;
+            return (result as unknown as { data: Contact }).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["contacts"] });
@@ -95,7 +115,7 @@ export function useUpdateContact() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateContactDto }) => {
             const result = await ContactsService.contactsControllerUpdate(id, data);
-            return (result as any).data;
+            return (result as unknown as { data: Contact }).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["contacts"] });

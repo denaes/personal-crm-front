@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useContact } from "@/lib/hooks/use-contacts";
+import { useContact, useUpdateContact } from "@/lib/hooks/use-contacts";
 import { useInteractionsByContact, useCreateInteraction, useDeleteInteraction } from "@/lib/hooks/use-interactions";
 import { useRemindersByContact, useCreateReminder, useDeleteReminder } from "@/lib/hooks/use-reminders";
 import { AppLayout } from "@/components/layout/app-layout";
@@ -18,6 +18,7 @@ import {
     Trash,
     MessageSquare,
 } from "lucide-react";
+import { FavoriteStar } from "@/components/ui/favorite-star";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -34,6 +35,7 @@ export default function ContactDetailsPage() {
     const { data: reminders, isLoading: remindersLoading } = useRemindersByContact(id);
     const { mutate: deleteInteraction } = useDeleteInteraction();
     const { mutate: deleteReminder } = useDeleteReminder();
+    const { mutate: updateContact } = useUpdateContact();
 
     if (contactLoading) {
         return (
@@ -103,6 +105,15 @@ export default function ContactDetailsPage() {
                                     className="font-display text-4xl font-bold mb-2"
                                 >
                                     {contact.displayName || `${contact.givenName} ${contact.familyName}`}
+                                    <button
+                                        onClick={() => updateContact({ id: contact.id, data: { isFavorite: !contact.isFavorite } })}
+                                        className="ml-3 inline-block align-middle p-1.5 hover:bg-muted rounded-full transition-colors"
+                                    >
+                                        <FavoriteStar
+                                            isFavorite={contact.isFavorite}
+                                            className="w-6 h-6"
+                                        />
+                                    </button>
                                 </motion.h1>
                                 <motion.div
                                     initial={{ opacity: 0, y: 10 }}
@@ -110,10 +121,10 @@ export default function ContactDetailsPage() {
                                     transition={{ delay: 0.1 }}
                                     className="flex flex-wrap gap-4 text-muted-foreground"
                                 >
-                                    {contact.organizations?.[0]?.title && (
+                                    {contact.title && (
                                         <span className="flex items-center gap-2">
-                                            {contact.organizations[0].title}
-                                            {contact.organizations[0].name ? ` at ${contact.organizations[0].name}` : ''}
+                                            {contact.title}
+                                            {contact.organization ? ` at ${contact.organization}` : ''}
                                         </span>
                                     )}
                                 </motion.div>
@@ -187,13 +198,13 @@ export default function ContactDetailsPage() {
                                     ) : !reminders || reminders.length === 0 ? (
                                         <p className="text-sm text-muted-foreground">No active reminders.</p>
                                     ) : (
-                                        reminders.map((reminder: { id: string; title?: string; message: string; scheduledFor?: string; createdAt: string }) => (
+                                        reminders.map((reminder) => (
                                             <div key={reminder.id} className="p-3 bg-muted/30 rounded-lg flex gap-3 group">
                                                 <div className="mt-1">
                                                     <Clock className="w-4 h-4 text-primary" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="font-medium text-sm">{reminder.title || reminder.message}</p>
+                                                    <p className="font-medium text-sm">{reminder.message || 'No message'}</p>
                                                     <p className="text-xs text-muted-foreground">
                                                         {formatDateWithOrdinal(reminder.scheduledFor || reminder.createdAt)}
                                                     </p>

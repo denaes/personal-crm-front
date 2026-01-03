@@ -1,17 +1,17 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { InteractionsService, CreateInteractionDto, UpdateInteractionDto } from "@/lib/api";
+import { InteractionsService, CreateInteractionDto, UpdateInteractionDto, InteractionResponseDto } from "@/lib/api";
 
 /**
  * Hook to fetch all interactions
  */
 export function useInteractions() {
-    return useQuery({
+    return useQuery<InteractionResponseDto[]>({
         queryKey: ["interactions"],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindAll();
-            return (result as any).data;
+            return (result as unknown as { data: InteractionResponseDto[] }).data;
         },
     });
 }
@@ -20,11 +20,11 @@ export function useInteractions() {
  * Hook to fetch interactions for a specific contact
  */
 export function useInteractionsByContact(contactId: string) {
-    return useQuery({
+    return useQuery<InteractionResponseDto[]>({
         queryKey: ["interactions", "contact", contactId],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindByContact(contactId);
-            return (result as any).data;
+            return (result as unknown as { data: InteractionResponseDto[] }).data;
         },
         enabled: !!contactId,
     });
@@ -34,11 +34,11 @@ export function useInteractionsByContact(contactId: string) {
  * Hook to fetch a single interaction by ID
  */
 export function useInteraction(id: string) {
-    return useQuery({
+    return useQuery<InteractionResponseDto>({
         queryKey: ["interaction", id],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindOne(id);
-            return (result as any).data;
+            return (result as unknown as { data: InteractionResponseDto }).data;
         },
         enabled: !!id,
     });
@@ -53,7 +53,7 @@ export function useCreateInteraction() {
     return useMutation({
         mutationFn: async (data: CreateInteractionDto) => {
             const result = await InteractionsService.interactionsControllerCreate(data);
-            return (result as any).data;
+            return (result as unknown as { data: InteractionResponseDto }).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["interactions"] });
@@ -70,7 +70,7 @@ export function useUpdateInteraction() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateInteractionDto }) => {
             const result = await InteractionsService.interactionsControllerUpdate(id, data);
-            return (result as any).data;
+            return (result as unknown as { data: InteractionResponseDto }).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["interactions"] });

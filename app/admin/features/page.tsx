@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import { DataTable } from "@/components/ui/data-table/data-table"
 import { getColumns, FeatureRequest } from "./columns" // Import getColumns factory
 import { api } from "@/lib/api-config"
@@ -25,7 +25,7 @@ export default function FeaturesPage() {
         fetchFeatures()
     }, [])
 
-    const updateStatus = async (id: string, status: string) => {
+    const updateStatus = useCallback(async (id: string, status: string) => {
         try {
             await api.put(`/api/v1/feature-requests/${id}`, { status })
             // Optimistic update or refetch
@@ -34,9 +34,9 @@ export default function FeaturesPage() {
             console.error("Failed to update status:", error)
             alert("Failed to update status")
         }
-    }
+    }, [])
 
-    const updateTags = async (id: string, tags: string[]) => {
+    const updateTags = useCallback(async (id: string, tags: string[]) => {
         try {
             await api.put(`/api/v1/feature-requests/${id}`, { tags })
             setFeatures(prev => prev.map(f => f.id === id ? { ...f, tags } : f))
@@ -44,10 +44,10 @@ export default function FeaturesPage() {
             console.error("Failed to update tags:", error)
             alert("Failed to update tags")
         }
-    }
+    }, [])
 
     // Pass functions directly as they are stable (declared within component but rely on stable deps or we explicitly ignore deps issue if we want, but better to just let useMemo handle it by passing them as deps)
-    const columns = useMemo(() => getColumns(updateStatus, updateTags), [getColumns, updateStatus, updateTags])
+    const columns = useMemo(() => getColumns(updateStatus, updateTags), [updateStatus, updateTags])
 
     if (isLoading) {
         return <div>Loading features...</div>

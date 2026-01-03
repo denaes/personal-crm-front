@@ -11,7 +11,8 @@ import {
     RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
-import { useContacts, useSyncContacts } from "@/lib/hooks/use-contacts";
+import { useContacts, useSyncContacts, useUpdateContact } from "@/lib/hooks/use-contacts";
+import { FavoriteStar } from "@/components/ui/favorite-star";
 
 import { getInitials } from "@/lib/utils";
 import { AppLayout } from "@/components/layout/app-layout";
@@ -39,6 +40,16 @@ export default function ContactsPage() {
     });
     const { data: recentContacts } = useContacts({ limit: 10, sortBy: 'updatedAt', sortOrder: 'DESC' });
     const { mutate: syncContacts, isPending: isSyncing } = useSyncContacts();
+    const { mutate: updateContact } = useUpdateContact();
+
+    const toggleFavorite = (e: React.MouseEvent, contact: any) => {
+        e.preventDefault(); // Prevent navigation
+        e.stopPropagation();
+        updateContact({
+            id: contact.id,
+            data: { isFavorite: !contact.isFavorite }
+        });
+    };
 
     const rawContacts = contactsData?.data || (Array.isArray(contactsData) ? contactsData : []);
     const contacts = Array.isArray(rawContacts) ? rawContacts : [];
@@ -211,6 +222,15 @@ export default function ContactsPage() {
                                                         <h3 className="text-center font-semibold text-lg mb-1">
                                                             {contact.givenName} {contact.familyName}
                                                         </h3>
+                                                        <button
+                                                            onClick={(e) => toggleFavorite(e, contact)}
+                                                            className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded-full"
+                                                        >
+                                                            <FavoriteStar
+                                                                isFavorite={contact.isFavorite}
+                                                                className="w-4 h-4"
+                                                            />
+                                                        </button>
 
                                                         {/* Contact Info */}
                                                         <div className="space-y-2 mb-4 flex-1">
@@ -272,7 +292,7 @@ export default function ContactsPage() {
                                                             initial={{ opacity: 0, x: -20 }}
                                                             animate={{ opacity: 1, x: 0 }}
                                                             transition={{ delay: index * 0.03 }}
-                                                            className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer group"
+                                                            className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors cursor-pointer group relative"
                                                         >
                                                             {/* Avatar */}
                                                             <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-white font-semibold group-hover:scale-110 transition-transform duration-300 overflow-hidden">
@@ -310,6 +330,16 @@ export default function ContactsPage() {
                                                                     </span>
                                                                 ))}
                                                             </div>
+
+                                                            <button
+                                                                onClick={(e) => toggleFavorite(e, contact)}
+                                                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded-full ml-4"
+                                                            >
+                                                                <FavoriteStar
+                                                                    isFavorite={contact.isFavorite}
+                                                                    className="w-4 h-4"
+                                                                />
+                                                            </button>
 
                                                             {/* Priority */}
                                                             <div
@@ -352,6 +382,6 @@ export default function ContactsPage() {
                     )}
                 </div>
             </div>
-        </AppLayout>
+        </AppLayout >
     );
 }

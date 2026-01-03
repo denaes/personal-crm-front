@@ -26,6 +26,10 @@ export type UpdateContactDto = {
      */
     followUpFrequencyDays?: number;
     /**
+     * Whether the contact is a favorite
+     */
+    isFavorite?: boolean;
+    /**
      * Last time you contacted this person (ISO 8601 format)
      */
     lastContactedAt?: string;

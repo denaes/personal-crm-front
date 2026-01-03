@@ -1,19 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 
-import { useContacts } from "@/lib/hooks/use-contacts";
+import { useContacts, Contact } from "@/lib/hooks/use-contacts";
 import { getInitials } from "@/lib/utils";
-
-interface Contact {
-    id: string;
-    displayName: string;
-    emailAddresses: string[];
-    photoUrl?: string;
-    givenName: string;
-    familyName?: string;
-}
 
 interface ContactMentionPickerProps {
     searchQuery: string;
@@ -38,7 +29,7 @@ export function ContactMentionPicker({
     });
 
     // Extract contacts from the response
-    const contacts = contactsData?.data || [];
+    const contacts = useMemo(() => contactsData?.data || [], [contactsData]);
 
     // Reset selected index when search results change
     useEffect(() => {
@@ -142,41 +133,45 @@ export function ContactMentionPicker({
             className="absolute z-50 w-80 bg-background border border-border rounded-lg shadow-lg overflow-hidden"
         >
             <div className="max-h-64 overflow-y-auto">
-                {contacts.map((contact: Contact, index: number) => (
-                    <div
-                        key={contact.id}
-                        data-index={index}
-                        onClick={() => onSelect(contact)}
-                        onMouseEnter={() => setSelectedIndex(index)}
-                        className={`flex items-center gap-3 px-4 py-2 cursor-pointer transition-colors ${index === selectedIndex
-                            ? "bg-primary/10 border-l-2 border-primary"
-                            : "hover:bg-muted/50"
-                            }`}
-                    >
-                        <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                            {contact.photoUrl ? (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                    src={contact.photoUrl}
-                                    alt={contact.displayName}
-                                    className="w-full h-full object-cover rounded-full"
-                                />
-                            ) : (
-                                getInitials(contact.displayName)
-                            )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                                {contact.displayName}
-                            </p>
-                            {contact.emailAddresses?.[0] && (
-                                <p className="text-xs text-muted-foreground truncate">
-                                    {contact.emailAddresses[0]}
+                {contacts.map((contact: Contact, index: number) => {
+                    const displayName = contact.displayName || `${contact.givenName} ${contact.familyName || ''}`.trim();
+
+                    return (
+                        <div
+                            key={contact.id}
+                            data-index={index}
+                            onClick={() => onSelect(contact)}
+                            onMouseEnter={() => setSelectedIndex(index)}
+                            className={`flex items-center gap-3 px-4 py-2 cursor-pointer transition-colors ${index === selectedIndex
+                                ? "bg-primary/10 border-l-2 border-primary"
+                                : "hover:bg-muted/50"
+                                }`}
+                        >
+                            <div className="w-8 h-8 rounded-full bg-gradient-primary flex items-center justify-center text-white text-sm font-semibold shrink-0">
+                                {contact.photoUrl ? (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                    <img
+                                        src={contact.photoUrl}
+                                        alt={displayName}
+                                        className="w-full h-full object-cover rounded-full"
+                                    />
+                                ) : (
+                                    getInitials(displayName)
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">
+                                    {displayName}
                                 </p>
-                            )}
+                                {contact.emailAddresses?.[0] && (
+                                    <p className="text-xs text-muted-foreground truncate">
+                                        {contact.emailAddresses[0]}
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </motion.div>
     );

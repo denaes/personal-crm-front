@@ -16,6 +16,7 @@ export type CreateContactDto = {
      * Follow-up frequency in days
      */
     followUpFrequencyDays?: number;
+    isFavorite?: boolean;
 };
 export namespace CreateContactDto {
     export enum priority {

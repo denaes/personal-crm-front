@@ -11,6 +11,7 @@ import { Search, Users, MessageSquare, Bell, Hash, ArrowRight, Lightbulb, Shield
 import { cn, getInitials } from "@/lib/utils";
 import { useContacts } from "@/lib/hooks/use-contacts";
 import { useAuthStore } from "@/lib/stores/auth-store";
+import { FavoriteStar } from "@/components/ui/favorite-star";
 
 interface CommandPaletteProps {
     open: boolean;
@@ -25,6 +26,7 @@ interface Command {
     action: () => void;
     category: "navigation" | "contacts" | "actions" | "tags";
     initials?: string;
+    isFavorite?: boolean;
 }
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
@@ -50,11 +52,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     });
 
     // Safely extract contacts list handling both Search (Array) and List (Paginated Object) responses
-    const contactsList = Array.isArray(contactsData)
-        ? contactsData
-        : (contactsData && typeof contactsData === 'object' && 'data' in contactsData && Array.isArray(contactsData.data)
-            ? contactsData.data
-            : []);
+    const contactsList = useMemo(() => contactsData?.data || [], [contactsData]);
 
     // Static commands
     const staticCommands: Command[] = useMemo(
@@ -163,6 +161,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 icon: Users,
                 category: "contacts",
                 initials: getInitials(contact.displayName || `${contact.givenName} ${contact.familyName}`),
+                isFavorite: contact.isFavorite,
                 action: () => router.push(`/contacts/${contact.id}`),
             }));
 
@@ -337,8 +336,14 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                                                             <cmd.icon className={cn("w-4 h-4 flex-shrink-0", isSelected ? "text-primary-foreground" : "text-muted-foreground")} />
                                                         )}
                                                         <div className="flex-1 min-w-0">
-                                                            <div className="text-sm font-medium truncate">
+                                                            <div className="text-sm font-medium truncate flex items-center gap-2">
                                                                 {cmd.title}
+                                                                {cmd.isFavorite && (
+                                                                    <FavoriteStar
+                                                                        isFavorite={true}
+                                                                        className="w-3 h-3"
+                                                                    />
+                                                                )}
                                                             </div>
                                                             {cmd.subtitle && (
                                                                 <div className={cn("text-xs truncate", isSelected ? "text-primary-foreground/80" : "text-muted-foreground")}>

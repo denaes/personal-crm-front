@@ -1,17 +1,17 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { RemindersService, CreateReminderDto, UpdateReminderDto } from "@/lib/api";
+import { RemindersService, CreateReminderDto, UpdateReminderDto, ReminderResponseDto } from "@/lib/api";
 
 /**
  * Hook to fetch all reminders
  */
 export function useReminders(active?: boolean) {
-    return useQuery({
+    return useQuery<ReminderResponseDto[]>({
         queryKey: ["reminders", active],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindAll(active);
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto[] }).data;
         },
     });
 }
@@ -20,11 +20,11 @@ export function useReminders(active?: boolean) {
  * Hook to fetch due reminders
  */
 export function useDueReminders() {
-    return useQuery({
+    return useQuery<ReminderResponseDto[]>({
         queryKey: ["reminders", "due"],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindDue();
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto[] }).data;
         },
     });
 }
@@ -33,11 +33,11 @@ export function useDueReminders() {
  * Hook to fetch reminders for a specific contact
  */
 export function useRemindersByContact(contactId: string) {
-    return useQuery({
+    return useQuery<ReminderResponseDto[]>({
         queryKey: ["reminders", "contact", contactId],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindByContact(contactId);
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto[] }).data;
         },
         enabled: !!contactId,
     });
@@ -47,11 +47,11 @@ export function useRemindersByContact(contactId: string) {
  * Hook to fetch a single reminder by ID
  */
 export function useReminder(id: string) {
-    return useQuery({
+    return useQuery<ReminderResponseDto>({
         queryKey: ["reminder", id],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindOne(id);
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto }).data;
         },
         enabled: !!id,
     });
@@ -66,7 +66,7 @@ export function useCreateReminder() {
     return useMutation({
         mutationFn: async (data: CreateReminderDto) => {
             const result = await RemindersService.remindersControllerCreate(data);
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto }).data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });
@@ -83,7 +83,7 @@ export function useUpdateReminder() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateReminderDto }) => {
             const result = await RemindersService.remindersControllerUpdate(id, data);
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto }).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });
@@ -115,7 +115,7 @@ export function useSnoozeReminder() {
     return useMutation({
         mutationFn: async ({ id, hours }: { id: string; hours?: number }) => {
             const result = await RemindersService.remindersControllerSnooze(id, hours);
-            return (result as any).data;
+            return (result as unknown as { data: ReminderResponseDto }).data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });

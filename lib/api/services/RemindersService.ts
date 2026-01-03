@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateReminderDto } from '../models/CreateReminderDto';
-import type { ReminderResponseDto } from '../models/ReminderResponseDto';
 import type { UpdateReminderDto } from '../models/UpdateReminderDto';
+import type { WrappedReminderListResponseDto } from '../models/WrappedReminderListResponseDto';
+import type { WrappedReminderResponseDto } from '../models/WrappedReminderResponseDto';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -12,12 +13,12 @@ export class RemindersService {
     /**
      * Create a new reminder
      * @param requestBody
-     * @returns ReminderResponseDto Reminder created successfully
+     * @returns WrappedReminderResponseDto Reminder created successfully
      * @throws ApiError
      */
     public static remindersControllerCreate(
         requestBody: CreateReminderDto,
-    ): CancelablePromise<ReminderResponseDto> {
+    ): CancelablePromise<WrappedReminderResponseDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/reminders',
@@ -28,12 +29,12 @@ export class RemindersService {
     /**
      * Get all reminders for the current user
      * @param active Filter by active reminders only
-     * @returns ReminderResponseDto List of reminders
+     * @returns WrappedReminderListResponseDto List of reminders
      * @throws ApiError
      */
     public static remindersControllerFindAll(
         active?: boolean,
-    ): CancelablePromise<Array<ReminderResponseDto>> {
+    ): CancelablePromise<WrappedReminderListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/reminders',
@@ -44,10 +45,10 @@ export class RemindersService {
     }
     /**
      * Get all due reminders (scheduled time has passed)
-     * @returns ReminderResponseDto List of due reminders
+     * @returns WrappedReminderListResponseDto List of due reminders
      * @throws ApiError
      */
-    public static remindersControllerFindDue(): CancelablePromise<Array<ReminderResponseDto>> {
+    public static remindersControllerFindDue(): CancelablePromise<WrappedReminderListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/reminders/due',
@@ -56,12 +57,12 @@ export class RemindersService {
     /**
      * Get all reminders for a specific contact
      * @param contactId Contact ID
-     * @returns ReminderResponseDto List of reminders for contact
+     * @returns WrappedReminderListResponseDto List of reminders for contact
      * @throws ApiError
      */
     public static remindersControllerFindByContact(
         contactId: string,
-    ): CancelablePromise<Array<ReminderResponseDto>> {
+    ): CancelablePromise<WrappedReminderListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/reminders/contact/{contactId}',
@@ -73,12 +74,12 @@ export class RemindersService {
     /**
      * Get a specific reminder by ID
      * @param id Reminder ID
-     * @returns ReminderResponseDto Reminder details
+     * @returns WrappedReminderResponseDto Reminder details
      * @throws ApiError
      */
     public static remindersControllerFindOne(
         id: string,
-    ): CancelablePromise<ReminderResponseDto> {
+    ): CancelablePromise<WrappedReminderResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/reminders/{id}',
@@ -94,13 +95,13 @@ export class RemindersService {
      * Update a reminder
      * @param id Reminder ID
      * @param requestBody
-     * @returns ReminderResponseDto Reminder updated successfully
+     * @returns WrappedReminderResponseDto Reminder updated successfully
      * @throws ApiError
      */
     public static remindersControllerUpdate(
         id: string,
         requestBody: UpdateReminderDto,
-    ): CancelablePromise<ReminderResponseDto> {
+    ): CancelablePromise<WrappedReminderResponseDto> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/v1/reminders/{id}',
@@ -138,13 +139,13 @@ export class RemindersService {
      * Snooze a reminder by X hours
      * @param id Reminder ID
      * @param hours Number of hours to snooze (default: 1)
-     * @returns ReminderResponseDto Reminder snoozed successfully
+     * @returns WrappedReminderResponseDto Reminder snoozed successfully
      * @throws ApiError
      */
     public static remindersControllerSnooze(
         id: string,
         hours?: number,
-    ): CancelablePromise<ReminderResponseDto> {
+    ): CancelablePromise<WrappedReminderResponseDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/reminders/{id}/snooze',

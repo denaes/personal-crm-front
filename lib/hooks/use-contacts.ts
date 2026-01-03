@@ -1,17 +1,9 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ContactsService, CreateContactDto, UpdateContactDto } from "@/lib/api";
+import { ContactsService, CreateContactDto, UpdateContactDto, ContactDto } from "@/lib/api";
 
-export interface Contact extends CreateContactDto {
-    id: string;
-    userId: string;
-    createdAt: string;
-    updatedAt: string;
-    lastContactedAt?: string | null;
-    displayName?: string;
-    photoUrl?: string; // Also adding photoUrl as it is used
-}
+export type Contact = ContactDto;
 
 interface ContactsResponse {
     data: Contact[];
@@ -40,19 +32,12 @@ export function useContacts(options?: {
         queryFn: async () => {
             if (isSearch) {
                 const response = await ContactsService.contactsControllerSearch(options!.search!);
-                // Search returns data directly as ContactDto[], wrap it for consistency if needed or handle in UI
-                // The backend search endpoint returns ContactDto[] directly, not nested in data/meta
-                // But findAll returns { data: ContactDto[], total: number ... }
-                // To keep hook compatible with UI expecting { data: ... } we might need to wrap it specifically
-
-                // The search endpoint is also intercepted by TransformInterceptor!
-                // So response is { data: ContactDto[] }
+                // Search returns WrappedContactListResponseDto
                 // response.data is ContactDto[]
-
-                const contacts = (response as unknown as { data: Contact[] }).data;
+                const contacts = response.data || [];
 
                 return {
-                    data: contacts, // The component expects .data to be the array of contacts when it also has total/page
+                    data: contacts,
                     total: contacts.length,
                     page: 1,
                     limit: contacts.length
@@ -68,9 +53,16 @@ export function useContacts(options?: {
                 options?.sortOrder
             );
 
-            // Unwrap response data just like in search
-            // The global TransformInterceptor wraps everything in { data: ... }
-            return (response as unknown as { data: ContactsResponse }).data;
+            // response is ContactsListResponseDto
+            // response.data is PaginatedContactResultDto
+            const paginatedResult = response.data;
+
+            return {
+                data: paginatedResult.data || [],
+                total: paginatedResult.total,
+                page: paginatedResult.page,
+                limit: paginatedResult.limit
+            };
         },
     });
 }
@@ -83,7 +75,8 @@ export function useContact(id: string) {
         queryKey: ["contact", id],
         queryFn: async () => {
             const result = await ContactsService.contactsControllerFindOne(id);
-            return (result as unknown as { data: Contact }).data;
+            // result is ContactResponseDto, result.data is ContactDto
+            return result.data;
         },
         enabled: !!id,
     });
@@ -98,7 +91,8 @@ export function useCreateContact() {
     return useMutation({
         mutationFn: async (data: CreateContactDto) => {
             const result = await ContactsService.contactsControllerCreate(data);
-            return (result as unknown as { data: Contact }).data;
+            // result is ContactResponseDto
+            return result.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["contacts"] });
@@ -115,7 +109,8 @@ export function useUpdateContact() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateContactDto }) => {
             const result = await ContactsService.contactsControllerUpdate(id, data);
-            return (result as unknown as { data: Contact }).data;
+            // result is ContactResponseDto
+            return result.data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["contacts"] });

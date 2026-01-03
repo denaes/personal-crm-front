@@ -2,8 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ContactResponseDto } from '../models/ContactResponseDto';
+import type { ContactsListResponseDto } from '../models/ContactsListResponseDto';
 import type { CreateContactDto } from '../models/CreateContactDto';
 import type { UpdateContactDto } from '../models/UpdateContactDto';
+import type { WrappedContactListResponseDto } from '../models/WrappedContactListResponseDto';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -16,7 +19,7 @@ export class ContactsService {
      * @param tags
      * @param sortBy
      * @param sortOrder
-     * @returns any
+     * @returns ContactsListResponseDto
      * @throws ApiError
      */
     public static contactsControllerFindAll(
@@ -26,7 +29,7 @@ export class ContactsService {
         tags?: string,
         sortBy?: 'lastContactedAt' | 'updatedAt' | 'createdAt',
         sortOrder?: 'ASC' | 'DESC',
-    ): CancelablePromise<any> {
+    ): CancelablePromise<ContactsListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/contacts',
@@ -43,12 +46,12 @@ export class ContactsService {
     /**
      * Create new contact (syncs to Google)
      * @param requestBody
-     * @returns any
+     * @returns ContactResponseDto
      * @throws ApiError
      */
     public static contactsControllerCreate(
         requestBody: CreateContactDto,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<ContactResponseDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/contacts',
@@ -59,12 +62,12 @@ export class ContactsService {
     /**
      * Search contacts
      * @param q
-     * @returns any
+     * @returns WrappedContactListResponseDto
      * @throws ApiError
      */
     public static contactsControllerSearch(
         q: string,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<WrappedContactListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/contacts/search',
@@ -76,12 +79,12 @@ export class ContactsService {
     /**
      * Get contact by ID
      * @param id
-     * @returns any
+     * @returns ContactResponseDto
      * @throws ApiError
      */
     public static contactsControllerFindOne(
         id: string,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<ContactResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/contacts/{id}',
@@ -94,13 +97,13 @@ export class ContactsService {
      * Update contact (syncs to Google)
      * @param id
      * @param requestBody
-     * @returns any
+     * @returns ContactResponseDto
      * @throws ApiError
      */
     public static contactsControllerUpdate(
         id: string,
         requestBody: UpdateContactDto,
-    ): CancelablePromise<any> {
+    ): CancelablePromise<ContactResponseDto> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/v1/contacts/{id}',

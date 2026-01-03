@@ -11,7 +11,8 @@ export function useReminders(active?: boolean) {
         queryKey: ["reminders", active],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindAll(active);
-            return (result as unknown as { data: ReminderResponseDto[] }).data;
+            // result is WrappedReminderListResponseDto
+            return result.data || [];
         },
     });
 }
@@ -24,7 +25,8 @@ export function useDueReminders() {
         queryKey: ["reminders", "due"],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindDue();
-            return (result as unknown as { data: ReminderResponseDto[] }).data;
+            // result is WrappedReminderListResponseDto
+            return result.data || [];
         },
     });
 }
@@ -37,7 +39,8 @@ export function useRemindersByContact(contactId: string) {
         queryKey: ["reminders", "contact", contactId],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindByContact(contactId);
-            return (result as unknown as { data: ReminderResponseDto[] }).data;
+            // result is WrappedReminderListResponseDto
+            return result.data || [];
         },
         enabled: !!contactId,
     });
@@ -51,7 +54,8 @@ export function useReminder(id: string) {
         queryKey: ["reminder", id],
         queryFn: async () => {
             const result = await RemindersService.remindersControllerFindOne(id);
-            return (result as unknown as { data: ReminderResponseDto }).data;
+            // result is WrappedReminderResponseDto
+            return result.data;
         },
         enabled: !!id,
     });
@@ -66,7 +70,8 @@ export function useCreateReminder() {
     return useMutation({
         mutationFn: async (data: CreateReminderDto) => {
             const result = await RemindersService.remindersControllerCreate(data);
-            return (result as unknown as { data: ReminderResponseDto }).data;
+            // result is WrappedReminderResponseDto
+            return result.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });
@@ -83,7 +88,8 @@ export function useUpdateReminder() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateReminderDto }) => {
             const result = await RemindersService.remindersControllerUpdate(id, data);
-            return (result as unknown as { data: ReminderResponseDto }).data;
+            // result is WrappedReminderResponseDto
+            return result.data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });
@@ -115,7 +121,8 @@ export function useSnoozeReminder() {
     return useMutation({
         mutationFn: async ({ id, hours }: { id: string; hours?: number }) => {
             const result = await RemindersService.remindersControllerSnooze(id, hours);
-            return (result as unknown as { data: ReminderResponseDto }).data;
+            // result is WrappedReminderResponseDto
+            return result.data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["reminders"] });

@@ -3,8 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CreateInteractionDto } from '../models/CreateInteractionDto';
-import type { InteractionResponseDto } from '../models/InteractionResponseDto';
 import type { UpdateInteractionDto } from '../models/UpdateInteractionDto';
+import type { WrappedInteractionListResponseDto } from '../models/WrappedInteractionListResponseDto';
+import type { WrappedInteractionResponseDto } from '../models/WrappedInteractionResponseDto';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -12,12 +13,12 @@ export class InteractionsService {
     /**
      * Create a new interaction
      * @param requestBody
-     * @returns InteractionResponseDto Interaction created successfully
+     * @returns WrappedInteractionResponseDto Interaction created successfully
      * @throws ApiError
      */
     public static interactionsControllerCreate(
         requestBody: CreateInteractionDto,
-    ): CancelablePromise<InteractionResponseDto> {
+    ): CancelablePromise<WrappedInteractionResponseDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/interactions',
@@ -27,10 +28,10 @@ export class InteractionsService {
     }
     /**
      * Get all interactions for the current user
-     * @returns InteractionResponseDto List of interactions
+     * @returns WrappedInteractionListResponseDto List of interactions
      * @throws ApiError
      */
-    public static interactionsControllerFindAll(): CancelablePromise<Array<InteractionResponseDto>> {
+    public static interactionsControllerFindAll(): CancelablePromise<WrappedInteractionListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/interactions',
@@ -39,12 +40,12 @@ export class InteractionsService {
     /**
      * Get all interactions for a specific contact
      * @param contactId Contact ID
-     * @returns InteractionResponseDto List of interactions for contact
+     * @returns WrappedInteractionListResponseDto List of interactions for contact
      * @throws ApiError
      */
     public static interactionsControllerFindByContact(
         contactId: string,
-    ): CancelablePromise<Array<InteractionResponseDto>> {
+    ): CancelablePromise<WrappedInteractionListResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/interactions/contact/{contactId}',
@@ -56,12 +57,12 @@ export class InteractionsService {
     /**
      * Get a specific interaction by ID
      * @param id Interaction ID
-     * @returns InteractionResponseDto Interaction details
+     * @returns WrappedInteractionResponseDto Interaction details
      * @throws ApiError
      */
     public static interactionsControllerFindOne(
         id: string,
-    ): CancelablePromise<InteractionResponseDto> {
+    ): CancelablePromise<WrappedInteractionResponseDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/interactions/{id}',
@@ -77,13 +78,13 @@ export class InteractionsService {
      * Update an interaction
      * @param id Interaction ID
      * @param requestBody
-     * @returns InteractionResponseDto Interaction updated successfully
+     * @returns WrappedInteractionResponseDto Interaction updated successfully
      * @throws ApiError
      */
     public static interactionsControllerUpdate(
         id: string,
         requestBody: UpdateInteractionDto,
-    ): CancelablePromise<InteractionResponseDto> {
+    ): CancelablePromise<WrappedInteractionResponseDto> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/v1/interactions/{id}',

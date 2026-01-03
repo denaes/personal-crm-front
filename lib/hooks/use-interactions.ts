@@ -11,7 +11,8 @@ export function useInteractions() {
         queryKey: ["interactions"],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindAll();
-            return (result as unknown as { data: InteractionResponseDto[] }).data;
+            // result is WrappedInteractionListResponseDto
+            return result.data || [];
         },
     });
 }
@@ -24,7 +25,8 @@ export function useInteractionsByContact(contactId: string) {
         queryKey: ["interactions", "contact", contactId],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindByContact(contactId);
-            return (result as unknown as { data: InteractionResponseDto[] }).data;
+            // result is WrappedInteractionListResponseDto
+            return result.data || [];
         },
         enabled: !!contactId,
     });
@@ -38,7 +40,8 @@ export function useInteraction(id: string) {
         queryKey: ["interaction", id],
         queryFn: async () => {
             const result = await InteractionsService.interactionsControllerFindOne(id);
-            return (result as unknown as { data: InteractionResponseDto }).data;
+            // result is WrappedInteractionResponseDto
+            return result.data;
         },
         enabled: !!id,
     });
@@ -53,7 +56,8 @@ export function useCreateInteraction() {
     return useMutation({
         mutationFn: async (data: CreateInteractionDto) => {
             const result = await InteractionsService.interactionsControllerCreate(data);
-            return (result as unknown as { data: InteractionResponseDto }).data;
+            // result is WrappedInteractionResponseDto
+            return result.data;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["interactions"] });
@@ -70,7 +74,8 @@ export function useUpdateInteraction() {
     return useMutation({
         mutationFn: async ({ id, data }: { id: string; data: UpdateInteractionDto }) => {
             const result = await InteractionsService.interactionsControllerUpdate(id, data);
-            return (result as unknown as { data: InteractionResponseDto }).data;
+            // result is WrappedInteractionResponseDto
+            return result.data;
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: ["interactions"] });
